@@ -114,6 +114,8 @@
   .free-media{height:250px;border-radius:14px;background:linear-gradient(135deg,#ff9a3d,#ff6b6b);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px}
   .free-media .big{font-size:4.5rem;margin-bottom:8px}
   .free-media p{font-weight:800}
+  .post-image{width:100%;border-radius:14px;display:block;border:1px solid var(--border);cursor:zoom-in;transition:transform .2s}
+  .post-image:hover{transform:scale(1.01)}
 
   /* ---------- SIDEBAR BOXES ---------- */
   .side-box{padding:20px}
@@ -276,13 +278,43 @@
         </div>
       </div>
       <div class="tabs">
-        <button class="tab active" onclick="switchTab(this,'feed')">489 BEITRÄGE</button>
+        <button class="tab active" onclick="switchTab(this,'feed')">491 BEITRÄGE</button>
         <button class="tab" onclick="switchTab(this,'media')">MEDIEN</button>
         <button class="tab" onclick="switchTab(this,'about')">ÜBER MICH</button>
       </div>
 
       <!-- FEED -->
       <div id="tab-feed">
+        <article class="post">
+          <div class="post-header">
+            <div class="post-avatar"><img src="assets/magikarp-hero.jpg" alt="" onerror="this.outerHTML='🐟'" /></div>
+            <div class="post-meta"><strong>Magikarp Mike</strong><span class="time">Vor 10 Minuten · 🟣 Twitch</span></div>
+            <span class="post-tag" style="background:#9146ff;color:#fff">NEU</span>
+          </div>
+          <p class="post-caption">🚨 <strong>EXKLUSIV:</strong> Mein neues <strong>Magikarp Twitch Emote Pack</strong> ist da! HYPE, LOL, SAD, RAGE, LOVE, POG, SPLASH, EVOLVE… Welches Emote spammst du als Nächstes im Chat? 🫧💜</p>
+          <a href="assets/magikarp-emotes.jpg" target="_blank" rel="noopener"><img class="post-image" src="assets/magikarp-emotes.jpg" alt="Magikarp Twitch Emote Pack – 15 Emotes" /></a>
+          <div class="post-actions">
+            <button class="action-btn" onclick="toggleLike(this)">❤️ <span>2.048</span></button>
+            <button class="action-btn" onclick="openModal('post')">💬 128</button>
+            <button class="action-btn" onclick="sharePost()">↗️ Teilen</button>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-header">
+            <div class="post-avatar">🐟</div>
+            <div class="post-meta"><strong>Magikarp Mike</strong><span class="time">Vor 1 Stunde · ✏️ Studio</span></div>
+            <span class="post-tag" style="background:#e0f7fa;color:#0077b6">BTS</span>
+          </div>
+          <p class="post-caption">Behind the Scenes: So entsteht ein Magikarp! 🖍️ Von der Skizze bis zum fertigen Fisch – welcher Entwurf ist euer Favorit? 👀</p>
+          <a href="assets/magikarp-sketches.jpg" target="_blank" rel="noopener"><img class="post-image" src="assets/magikarp-sketches.jpg" alt="Magikarp Skizzen – vom Entwurf zum fertigen Fisch" /></a>
+          <div class="post-actions">
+            <button class="action-btn" onclick="toggleLike(this)">❤️ <span>1.337</span></button>
+            <button class="action-btn" onclick="openModal('post')">💬 69</button>
+            <button class="action-btn" onclick="sharePost()">↗️ Teilen</button>
+          </div>
+        </article>
+
         <article class="post">
           <div class="post-header">
             <div class="post-avatar"><img src="assets/magikarp-hero.jpg" alt="" onerror="this.outerHTML='🐟'" /></div>
@@ -351,6 +383,8 @@
         <article class="post">
           <p class="post-caption">📸 <strong>Medien-Galerie:</strong> Alle 420 Kiemen-Pics sind hinter der Paywall. Hier gibt's nur ein paar Vorschau-Blasen:</p>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+            <a href="assets/magikarp-emotes.jpg" target="_blank" rel="noopener"><img src="assets/magikarp-emotes.jpg" alt="Emote Pack" style="width:100%;height:130px;object-fit:cover;border-radius:12px;border:1px solid var(--border);display:block" /></a>
+            <a href="assets/magikarp-sketches.jpg" target="_blank" rel="noopener"><img src="assets/magikarp-sketches.jpg" alt="Magikarp Skizzen" style="width:100%;height:130px;object-fit:cover;border-radius:12px;border:1px solid var(--border);display:block" /></a>
             <div class="locked-media" style="height:130px" onclick="openModal('post')"><div class="big-emoji" style="font-size:3rem">🐟</div><div class="lock-overlay" style="padding:8px 12px"><div class="lock-icon" style="font-size:1.1rem">🔒</div></div></div>
             <div class="locked-media" style="height:130px" onclick="openModal('post')"><div class="big-emoji" style="font-size:3rem">🐠</div><div class="lock-overlay" style="padding:8px 12px"><div class="lock-icon" style="font-size:1.1rem">🔒</div></div></div>
             <div class="locked-media" style="height:130px" onclick="openModal('post')"><div class="big-emoji" style="font-size:3rem">🐡</div><div class="lock-overlay" style="padding:8px 12px"><div class="lock-icon" style="font-size:1.1rem">🔒</div></div></div>
