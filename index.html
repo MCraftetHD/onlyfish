@@ -121,6 +121,29 @@
   .post-image{width:100%;border-radius:14px;display:block;border:1px solid var(--border);cursor:zoom-in;transition:transform .2s}
   .post-image:hover{transform:scale(1.01)}
 
+  /* ---------- LIVE STATUS ---------- */
+  .live-dot.off{background:#94a3b8;animation:none;box-shadow:none}
+  .live-dot.wait{background:#ffb800}
+  .live-card-top{display:flex;align-items:center;gap:9px;font-size:.9rem}
+  .live-card-top .live-dot{width:10px;height:10px;flex-shrink:0}
+  .live-card-top.is-live strong{color:#e11d48}
+  .live-details{margin:10px 0 0}
+  .live-row{display:flex;justify-content:space-between;gap:12px;font-size:.83rem;padding:7px 0;border-bottom:1px dashed var(--border)}
+  .live-row:last-child{border-bottom:none}
+  .live-row span{color:var(--muted);flex-shrink:0}
+  .live-row strong{text-align:right;overflow-wrap:anywhere}
+  .live-title{font-size:.83rem;font-style:italic;color:#444;margin:10px 0 0;padding-left:10px;border-left:3px solid var(--pink);line-height:1.45}
+  .live-next{font-size:.8rem;color:var(--muted);margin-top:12px}
+  .live-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .live-actions .btn{flex:1;justify-content:center;text-align:center}
+  .live-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.72rem;color:var(--muted);margin-top:10px}
+  .live-refresh{background:none;border:0;cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:6px;line-height:1;color:var(--muted)}
+  .live-refresh:hover{background:var(--primary-light)}
+  .spin{animation:spin 1s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #liveEmbedWrap{margin-top:12px}
+  #liveEmbedWrap iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:12px;display:block;background:#000}
+
   /* ---------- SIDEBAR BOXES ---------- */
   .side-box{padding:20px}
   .side-box h3{font-size:1rem;font-weight:900;margin-bottom:4px}
@@ -239,14 +262,14 @@
 <section class="hero" id="hero">
   <div class="hero-inner">
     <div>
-      <div class="live-pill"><span class="live-dot"></span> LIVE aus dem Teich · dombledore1337 ist am Blubbern</div>
+      <div class="live-pill" id="heroPill"><span class="live-dot wait" id="heroDot"></span> <span id="heroPillText">Live-Status wird geladen…</span></div>
       <h1>100% unzensierte <em>Schuppen.</em><br>0% echte Fische.</h1>
       <p>Willkommen bei <strong>OnlyFish</strong> – der offiziellen Parodie-Seite von <strong>dombledore1337</strong>, dem einzigen Streamer, der Magikarp so sehr liebt, dass er dafür eine ganze Website gebaut hat. Keine Angelhaken in den DMs. Versprochen.</p>
       <div class="hero-ctas">
         <button class="btn btn-primary" onclick="openModal('abo')">💦 Jetzt abtauchen</button>
         <a class="btn btn-twitch" href="https://www.twitch.tv/dombledore1337" target="_blank" rel="noopener">🟣 Zum Twitch-Stream</a>
       </div>
-      <div class="hero-note">Chat-Befehl: <strong>!onlyfish</strong> · Nächster Stream: <strong id="countdown">–</strong></div>
+      <div class="hero-note">Chat-Befehl: <strong>!onlyfish</strong> · Nächster Stream: <strong>22:30 Uhr</strong> · in <strong id="countdown">–</strong></div>
     </div>
     <div class="hero-art">
       <img src="assets/magikarp-hero.jpg" alt="Magikarp Mike auf seinem rosa Herz-Kissen – das Gesicht von OnlyFish" onerror="this.style.display='none'" />
@@ -265,7 +288,7 @@
       <div class="profile-body">
         <div class="avatar-row">
           <div class="avatar"><img src="assets/magikarp-avatar.jpg" alt="Magikarp Mike Avatar" onerror="this.parentElement.innerHTML='🐟'" /></div>
-          <div class="status-pill">● Gerade am Blubbern</div>
+          <div class="status-pill" id="profileStatus">● Status wird geladen…</div>
         </div>
         <h1 class="profile-name">Magikarp Mike <span class="verified">✓</span></h1>
         <div class="handle">@dombledore1337 · Twitch-Streamer · Magikarp-Liebhaber</div>
@@ -434,6 +457,32 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
+    <!-- LIVE STATUS -->
+    <section class="card side-box" id="live">
+      <h3>🔴 Live-Status</h3>
+      <p class="sub">Direkt von Twitch geladen – echt, nicht fake.</p>
+      <div class="live-card-top" id="liveCardTop">
+        <span class="live-dot wait" id="liveDot"></span>
+        <strong id="liveState">Status wird geladen…</strong>
+      </div>
+      <p class="live-title hidden" id="liveTitle"></p>
+      <div class="live-details hidden" id="liveDetails">
+        <div class="live-row"><span>🎮 Spiel</span><strong id="liveGame">–</strong></div>
+        <div class="live-row"><span>👀 Zuschauer</span><strong id="liveViewers">–</strong></div>
+        <div class="live-row"><span>⏱️ Live seit</span><strong id="liveUptime">–</strong></div>
+      </div>
+      <p class="live-next" id="liveNext">Nächster Stream: <strong>22:30 Uhr</strong> · <span id="nextIn">–</span></p>
+      <div class="live-actions">
+        <a class="btn btn-twitch btn-sm" href="https://www.twitch.tv/dombledore1337" target="_blank" rel="noopener">🟣 Zum Stream</a>
+        <button class="btn btn-ghost btn-sm hidden" id="liveEmbedBtn" onclick="toggleEmbed()">▶️ Einbetten</button>
+      </div>
+      <div class="live-meta">
+        <span id="liveChecked">–</span>
+        <button class="live-refresh" id="liveRefresh" title="Status neu laden" aria-label="Status neu laden" onclick="refreshLive(true)">🔄</button>
+      </div>
+      <div id="liveEmbedWrap" class="hidden"></div>
+    </section>
+
     <!-- ABO -->
     <section class="card side-box" id="abo">
       <h3>💎 Abo-Tiers</h3>
@@ -696,19 +745,204 @@
     }
   })();
 
-  /* ---------- COUNTDOWN (fake next stream) ---------- */
+  /* ---------- STREAM SCHEDULE ---------- */
+  const STREAM_HOUR = 22, STREAM_MIN = 30;   // 22:30 Uhr
+  const CHECK_INTERVAL = 60 * 1000;          // Status jede Minute neu
+  const TZ = "Europe/Berlin";
+
+  /* ---------- TWITCH CREDENTIALS (optional) ----------
+     Ohne Credentials wird automatisch eine oeffentliche Status-API genutzt.
+     Mit eigenen Credentials (siehe README) laeuft alles ueber die offizielle Helix-API.
+     ACHTUNG: Auf einer rein statischen Seite ist ein Client-Secret nie wirklich geheim.
+     Fuer einen oeffentlichen Gag-Link reicht der Fallback voellig aus. */
+  const TWITCH_CLIENT_ID = "";       // <- Client-ID eintragen (optional)
+  const TWITCH_ACCESS_TOKEN = "";    // <- App Access Token eintragen (optional)
+  const TWITCH_HELIX = "https://api.twitch.tv/helix/streams?user_login=dombledore1337";
+
+  /* ---------- COUNTDOWN (naechster Stream 22:30) ---------- */
   (function(){
-    const el = document.getElementById("countdown");
-    function tick(){
+    function nextStream(){
       const now = new Date();
-      const next = new Date(now); next.setHours(19,0,0,0);
+      const next = new Date(now);
+      next.setHours(STREAM_HOUR, STREAM_MIN, 0, 0);
       if(next <= now) next.setDate(next.getDate()+1);
-      const diff = next - now;
+      return next;
+    }
+    const el = document.getElementById("countdown");
+    const nextEl = document.getElementById("nextIn");
+    function tick(){
+      const diff = nextStream() - new Date();
       const h = Math.floor(diff/3600000), m = Math.floor(diff%3600000/60000), s = Math.floor(diff%60000/1000);
-      el.textContent = h+"h "+m+"m "+s+"s";
+      const txt = h+"h "+m+"m "+s+"s";
+      if(el) el.textContent = txt;
+      if(nextEl) nextEl.textContent = "in " + txt;
     }
     tick(); setInterval(tick,1000);
   })();
+
+  /* ---------- LIVE STATUS ---------- */
+  const LIVE = { state:"unknown", checked:null, isLive:false, title:"", game:"", viewers:0, startedAt:null };
+
+  function fmtViewers(n){
+    return (n||0).toLocaleString("de-DE");
+  }
+  function fmtUptime(iso){
+    if(!iso) return "–";
+    const d = Date.now() - new Date(iso).getTime();
+    if(d < 0) return "gerade eben";
+    const h = Math.floor(d/3600000), m = Math.floor(d%3600000/60000);
+    if(h < 1) return m + " Min";
+    return h + " Std " + m + " Min";
+  }
+  function fmtTime(date){
+    return date.toLocaleTimeString("de-DE", {hour:"2-digit", minute:"2-digit", timeZone:TZ}) + " Uhr";
+  }
+
+  function setLiveUI(){
+    const dot = document.getElementById("liveDot");
+    const state = document.getElementById("liveState");
+    const top = document.getElementById("liveCardTop");
+    const heroDot = document.getElementById("heroDot");
+    const heroText = document.getElementById("heroPillText");
+    const checked = document.getElementById("liveChecked");
+    const nextLine = document.getElementById("liveNext");
+    const embedBtn = document.getElementById("liveEmbedBtn");
+    const profileStatus = document.getElementById("profileStatus");
+
+    if(LIVE.state === "checking"){
+      if(state) state.textContent = "Status wird geprüft…";
+      return;
+    }
+
+    if(LIVE.state === "live"){
+      dot.className = "live-dot";
+      top.classList.add("is-live");
+      state.innerHTML = "🔴 <strong>LIVE</strong> – er ist am Blubbern!";
+      const t = document.getElementById("liveTitle");
+      t.classList.remove("hidden");
+      t.textContent = "„" + (LIVE.title || "Ohne Titel im Teich") + "“";
+      document.getElementById("liveDetails").classList.remove("hidden");
+      document.getElementById("liveGame").textContent = LIVE.game || "Unbekannt";
+      document.getElementById("liveViewers").textContent = LIVE.viewers ? fmtViewers(LIVE.viewers) : "–";
+      document.getElementById("liveUptime").textContent = fmtUptime(LIVE.startedAt);
+      nextLine.classList.add("hidden");
+      embedBtn.classList.remove("hidden");
+
+      heroDot.className = "live-dot";
+      heroText.innerHTML = "<strong>JETZT LIVE</strong> · dombledore1337 ist am Blubbern" +
+        (LIVE.viewers ? " · " + fmtViewers(LIVE.viewers) + " Zuschauer" : "");
+      if(profileStatus){ profileStatus.textContent = "● Gerade live am Blubbern"; }
+    } else if(LIVE.state === "unknown"){
+      dot.className = "live-dot off";
+      top.classList.remove("is-live");
+      state.innerHTML = "<span style='color:var(--muted)'>❔ Status unbekannt</span>";
+      document.getElementById("liveTitle").classList.add("hidden");
+      document.getElementById("liveDetails").classList.add("hidden");
+      nextLine.classList.remove("hidden");
+      embedBtn.classList.add("hidden");
+
+      heroDot.className = "live-dot off";
+      heroText.innerHTML = "Live-Status gerade nicht abrufbar · nächster Stream um <strong>22:30 Uhr</strong>";
+      if(profileStatus){ profileStatus.textContent = "● Status unbekannt – nächster Stream 22:30 Uhr"; }
+    } else {
+      dot.className = "live-dot off";
+      top.classList.remove("is-live");
+      state.innerHTML = "<span style='color:var(--muted)'>⚪ Offline – der Teich ruht</span>";
+      document.getElementById("liveTitle").classList.add("hidden");
+      document.getElementById("liveDetails").classList.add("hidden");
+      nextLine.classList.remove("hidden");
+      embedBtn.classList.add("hidden");
+      document.getElementById("liveEmbedWrap").classList.add("hidden");
+
+      heroDot.className = "live-dot off";
+      heroText.innerHTML = "Offline · nächster Stream um <strong>22:30 Uhr</strong>";
+      if(profileStatus){ profileStatus.textContent = "● Offline – nächster Stream 22:30 Uhr"; }
+    }
+    if(checked){
+      checked.textContent = LIVE.state === "unknown" || LIVE.state === "checking"
+        ? "Status nicht verfügbar"
+        : "Geprüft um " + fmtTime(new Date());
+    }
+  }
+
+  async function fetchHelix(){
+    if(!TWITCH_CLIENT_ID || !TWITCH_ACCESS_TOKEN) throw new Error("no credentials");
+    const res = await fetch(TWITCH_HELIX, {
+      headers: { "Client-ID": TWITCH_CLIENT_ID, "Authorization": "Bearer " + TWITCH_ACCESS_TOKEN }
+    });
+    if(!res.ok) throw new Error("helix " + res.status);
+    const json = await res.json();
+    return (json.data && json.data[0]) || null;
+  }
+
+  /* Fallback 1: decapi.me (liefert "offline" oder die Live-Zeit) */
+  async function fetchDecapi(){
+    const res = await fetch("https://decapi.me/twitch/uptime/dombledore1337?t=" + Date.now());
+    if(!res.ok) throw new Error("decapi " + res.status);
+    const txt = (await res.text()).trim();
+    if(!txt || /offline|not live|error/i.test(txt)) return null;
+    // "1 hours 20 mins" -> grobe Startzeit
+    const hm = txt.match(/(\d+)\s*hour/i), mm = txt.match(/(\d+)\s*min/i);
+    const ms = (hm ? +hm[1]*3600000 : 0) + (mm ? +mm[1]*60000 : 0);
+    return { title: "", game: "", viewers: 0, started_at: new Date(Date.now() - ms).toISOString() };
+  }
+
+  /* Fallback 2: ivr.fi (rein oeffentlich, CORS-freundlich) */
+  async function fetchIvr(){
+    const res = await fetch("https://api.ivr.fi/v2/twitch/user?login=dombledore1337&t=" + Date.now());
+    if(!res.ok) throw new Error("ivr " + res.status);
+    const json = await res.json();
+    const u = Array.isArray(json) ? json[0] : json;
+    if(!u || !u.live) return null;
+    return { title: u.title || "", game: u.game || "", viewers: 0, started_at: u.liveAt || null };
+  }
+
+  async function refreshLive(manual){
+    const btn = document.getElementById("liveRefresh");
+    if(btn) btn.classList.add("spin");
+    const checkedEl = document.getElementById("liveChecked");
+    if(manual && checkedEl) checkedEl.textContent = "Wird neu geladen…";
+    LIVE.state = "checking";
+    setLiveUI();
+
+    const chain = [fetchHelix, fetchDecapi, fetchIvr];
+    let data = null, ok = false;
+    for(const fn of chain){
+      try { data = await fn(); ok = true; break; }
+      catch(err){ /* naechster Fallback */ }
+    }
+
+    if(ok){
+      LIVE.state = data ? "live" : "offline";
+      LIVE.isLive = !!data;
+      LIVE.title = data?.title || "";
+      LIVE.game = data?.game || "";
+      LIVE.viewers = data?.viewers || 0;
+      LIVE.startedAt = data?.started_at || null;
+    } else {
+      LIVE.state = "unknown";
+      LIVE.isLive = false;
+    }
+    setLiveUI();
+    if(btn) btn.classList.remove("spin");
+    if(manual) showToast(LIVE.state === "unknown"
+      ? "🌊 Status gerade nicht abrufbar – Twitch-API nicht erreichbar."
+      : (LIVE.isLive ? "🔴 Live! Ab in den Stream." : "⚪ Offline. Um 22:30 geht's weiter."));
+  }
+
+  function toggleEmbed(){
+    const wrap = document.getElementById("liveEmbedWrap");
+    const open = wrap.classList.toggle("hidden") === false;
+    if(open && !wrap.dataset.loaded){
+      const host = location.hostname || "localhost";
+      wrap.innerHTML = '<iframe src="https://player.twitch.tv/?channel=dombledore1337&parent=' + host + '&autoplay=true" allowfullscreen allow="autoplay; fullscreen; picture-in-picture"></iframe>';
+      wrap.dataset.loaded = "1";
+    }
+  }
+
+  refreshLive(false);
+  setInterval(()=>refreshLive(false), CHECK_INTERVAL);
+
 </script>
 </body>
 </html>
