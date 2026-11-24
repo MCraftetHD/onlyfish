@@ -34,8 +34,34 @@ Der Bot antwortet mit dem Link zu dieser Seite.
 - Gesperrte Beiträge, Likes, Teilen, Gratis-Geschenk
 - 🎮 **Füttere Magikarp:** 50 Klicks → Evolution zu Gyarados 🐉
 - 💬 Fake-DM mit Auto-Antworten („Blub.")
-- 📋 `!onlyfish` kopieren, Countdown zum nächsten Stream (19 Uhr)
+- 📋 `!onlyfish` kopieren, Countdown zum nächsten Stream (22:30 Uhr)
+- 🔴 **Echter Live-Status** von Twitch (live/offline, Spiel, Zuschauer, Uptime) + optionaler Stream-Embed
 - Blasen-Animation, Splash-Effekte, Konfetti
+
+## 🔴 Live-Status (Twitch)
+
+Die Seite zeigt in der Sidebar und im Hero an, ob dombledore1337 gerade live ist – mit Spiel, Zuschauerzahl und Uptime. Alle 60 Sekunden wird neu geladen, dazu gibt es einen manuellen Refresh-Button.
+
+**Ohne Einrichtung** funktioniert das sofort: Es werden öffentliche Status-APIs abgefragt (decapi.me, dann ivr.fi). Das ist CORS-freundlich und braucht keinen Key – ideal für GitHub Pages.
+
+**Eigene Twitch-API (optional, mehr Details):** Trage in `index.html` oben im Script-Block deine Werte ein:
+
+```js
+const TWITCH_CLIENT_ID = "deine-client-id";
+const TWITCH_ACCESS_TOKEN = "dein-app-access-token";
+```
+
+So bekommst du es:
+1. [dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps) → „Register your application", Typ **Public**
+2. Client-ID kopieren
+3. App Access Token holen (gültig ~60 Tage):
+   ```
+   POST https://id.twitch.tv/oauth2/token?client_id=DEINE_ID&client_secret=DEIN_SECRET&grant_type=client_credentials
+   ```
+
+⚠️ **Wichtig:** Ein Twitch-Client-Secret in einer statischen Seite ist nie wirklich geheim. Wer den Quellcode liest, sieht es. Für einen Gag-Link reicht der öffentliche Fallback völlig aus – nutze eigene Credentials nur, wenn dir das egal ist oder die Seite hinter einem Login liegt. Den App Access Token (nicht das Secret!) sieht man zwar auch, aber er läuft nach ~60 Tagen ab und hat nur Lesezugriff.
+
+**Stream einbetten:** Wenn er live ist, erscheint im Live-Status ein Button „▶️ Einbetten". Der Player wird erst auf Klick geladen (kein Autoplay-Stress) und nutzt automatisch deinen Hostnamen als Twitch-`parent`.
 
 ## ⚠️ Hinweis
 
