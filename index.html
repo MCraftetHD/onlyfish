@@ -172,16 +172,69 @@
   .fan-name{font-weight:800}
   .fan-fish{margin-left:auto;color:var(--muted);font-size:.8rem}
 
-  /* ---------- GAME ---------- */
-  .game-fish{font-size:5.2rem;text-align:center;cursor:pointer;user-select:none;transition:transform .08s;line-height:1.2;padding:10px 0}
-  .game-fish img{width:124px;height:124px;border-radius:50%;object-fit:cover;display:inline-block;vertical-align:middle;border:4px solid var(--primary-light);box-shadow:0 8px 22px rgba(2,44,74,.22)}
-  .game-fish:active{transform:scale(1.18) rotate(-6deg)}
-  .game-fish.evolved{font-size:6rem}
+  /* ---------- GAME / TYCOON ---------- */
+  .game-wrap{position:relative}
+  .game-fish{text-align:center;cursor:pointer;user-select:none;transition:transform .07s;line-height:1;padding:6px 0 2px;-webkit-tap-highlight-color:transparent}
+  .game-fish img{width:118px;height:118px;border-radius:50%;object-fit:cover;display:inline-block;vertical-align:middle;border:4px solid var(--primary-light);box-shadow:0 8px 22px rgba(2,44,74,.22);pointer-events:none;transition:border-color .3s,box-shadow .3s}
+  .game-fish:active{transform:scale(1.13) rotate(-4deg)}
+  .game-fish.evolved img{border-color:#ffd166;box-shadow:0 0 0 6px rgba(255,209,102,.35),0 10px 26px rgba(2,44,74,.3)}
+  .float-num{position:fixed;pointer-events:none;font-weight:900;font-size:1rem;color:var(--primary-dark);animation:floatUp .9s ease-out forwards;z-index:150}
+  @keyframes floatUp{from{transform:translateY(0);opacity:1}to{transform:translateY(-46px);opacity:0}}
+  .game-badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px;min-height:22px}
+  .gb{font-size:.7rem;font-weight:800;padding:3px 9px;border-radius:999px;background:#eef2f7;color:#475569}
+  .gb.hot{background:#fff1f2;color:#e11d48}
+  .game-res{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .res-cell{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:8px 10px;text-align:center}
+  .res-cell span{display:block;font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+  .res-cell strong{font-size:1.05rem}
   .evo-wrap{background:#f1f5f9;border-radius:999px;height:16px;overflow:hidden;margin:12px 0 6px}
   .evo-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff9a3d,#ff6b6b);border-radius:999px;transition:width .25s}
-  .evo-labels{display:flex;justify-content:space-between;font-size:.75rem;font-weight:800;color:var(--muted)}
-  .game-stats{display:flex;justify-content:space-between;font-size:.88rem;font-weight:700;margin-top:10px}
-  .game-msg{text-align:center;font-size:.88rem;color:var(--muted);min-height:1.4em;margin-top:8px;font-weight:600}
+  .evo-fill.done{background:linear-gradient(90deg,#ffd166,#48cae4)}
+  .evo-labels{display:flex;justify-content:space-between;gap:6px;font-size:.72rem;color:var(--muted);font-weight:700;align-items:center}
+  .upg-list{margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
+  .upg-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:8px}
+  .upg-head strong{font-size:.86rem}
+  .upg-head span{font-size:.72rem;color:var(--muted)}
+  .upg{display:flex;align-items:center;gap:9px;border:1.5px solid var(--border);border-radius:12px;padding:9px 10px;margin-bottom:7px;background:#fff;transition:.15s;cursor:pointer;text-align:left;width:100%;font-family:inherit}
+  .upg:hover:not(:disabled){border-color:var(--primary);transform:translateY(-1px)}
+  .upg:disabled{opacity:.55;cursor:not-allowed;background:#f8fafc}
+  .upg-icon{font-size:1.15rem;width:26px;text-align:center;flex-shrink:0}
+  .upg-body{flex:1;min-width:0}
+  .upg-name{font-weight:800;font-size:.82rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .upg-lvl{background:var(--primary-light);color:var(--primary-dark);font-size:.64rem;padding:1px 6px;border-radius:999px;font-weight:900}
+  .upg-desc{font-size:.71rem;color:var(--muted);line-height:1.3;display:block}
+  .upg-cost{font-weight:900;font-size:.78rem;color:#b8860b;white-space:nowrap;flex-shrink:0}
+  .upg-cost.maxed{color:var(--muted);font-size:.66rem}
+  .game-msg{text-align:center;font-size:.83rem;color:var(--muted);min-height:1.4em;margin-top:10px;font-weight:600}
+  .game-actions{display:flex;gap:7px;margin-top:10px}
+  .game-actions .btn{flex:1;justify-content:center;font-size:.76rem;padding:8px 6px}
+
+  /* ---------- LEADERBOARD ---------- */
+  .lb-box{margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
+  .lb-title{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:8px}
+  .lb-title strong{font-size:.86rem}
+  .lb-title span{font-size:.72rem;color:var(--muted)}
+  .lb-form{display:flex;gap:6px;margin-bottom:8px}
+  .lb-input{flex:1;min-width:0;border:1.5px solid var(--border);border-radius:999px;padding:8px 13px;font-size:.82rem;font-family:inherit;font-weight:700;color:var(--text);background:#fff;outline:none;transition:border-color .15s}
+  .lb-input:focus{border-color:var(--primary)}
+  .lb-input.bad{border-color:#e11d48;animation:shake .35s}
+  .lb-submit{border:none;background:var(--primary);color:#fff;font-weight:900;font-size:.78rem;border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap;font-family:inherit}
+  .lb-submit:hover:not(:disabled){background:var(--primary-dark)}
+  .lb-submit:disabled{opacity:.5;cursor:not-allowed}
+  .lb-hint{font-size:.68rem;color:var(--muted);margin-bottom:9px;line-height:1.35;min-height:1.9em}
+  .lb-list{list-style:none;display:flex;flex-direction:column;gap:3px;max-height:206px;overflow-y:auto;padding-right:2px}
+  .lb-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:9px;font-size:.8rem}
+  .lb-item:nth-child(odd){background:#f8fafc}
+  .lb-item.me{background:var(--primary-light);outline:1.5px solid var(--primary)}
+  .lb-pos{font-weight:900;font-size:.72rem;width:20px;flex-shrink:0;color:var(--muted);text-align:center}
+  .lb-item:nth-child(1) .lb-pos{color:#b45309}
+  .lb-item:nth-child(2) .lb-pos{color:#64748b}
+  .lb-item:nth-child(3) .lb-pos{color:#c2410c}
+  .lb-name{flex:1;min-width:0;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lb-score{font-weight:900;font-size:.76rem;color:var(--primary-dark);white-space:nowrap}
+  .lb-empty{font-size:.76rem;color:var(--muted);text-align:center;padding:12px 4px}
+  .lb-foot{display:flex;justify-content:space-between;align-items:center;margin-top:7px;font-size:.66rem;color:var(--muted);gap:8px}
+  .lb-clear{background:none;border:none;color:var(--muted);font-size:.66rem;cursor:pointer;text-decoration:underline;font-family:inherit;padding:0}
 
   /* ---------- DM ---------- */
   .dm-window{border:1px solid var(--border);border-radius:14px;overflow:hidden}
@@ -468,7 +521,6 @@
       <p class="live-title hidden" id="liveTitle"></p>
       <div class="live-details hidden" id="liveDetails">
         <div class="live-row"><span>🎮 Spiel</span><strong id="liveGame">–</strong></div>
-        <div class="live-row"><span>👀 Zuschauer</span><strong id="liveViewers">–</strong></div>
         <div class="live-row"><span>⏱️ Live seit</span><strong id="liveUptime">–</strong></div>
       </div>
       <p class="live-next" id="liveNext">Nächster Stream: <strong>22:30 Uhr</strong> · <span id="nextIn">–</span></p>
@@ -505,13 +557,54 @@
 
     <!-- GAME -->
     <section class="card side-box" id="spiel">
-      <h3>🎮 Füttere Magikarp</h3>
-      <p class="sub">Klicke auf den Fisch, um ihn zu füttern. Bei 50 Blubbern: Evolution!</p>
-      <div class="game-fish" id="gameFish" onclick="feedFish(event)"><img src="assets/magikarp-avatar.jpg" alt="Magikarp Mike füttern" /></div>
+      <h3>🎮 Magikarp Tycoon</h3>
+      <p class="sub">Klick, sammle Blubber, kauf Upgrades – bei 50 entwickelst du ihn zum Gyarados 🐉</p>
+
+      <div class="game-wrap">
+        <div class="game-fish" id="gameFish" onclick="feedFish(event)" role="button" tabindex="0" aria-label="Magikarp füttern">
+          <img src="assets/magikarp-avatar.jpg" alt="Magikarp Mike füttern" id="gameFishImg" />
+        </div>
+        <div class="game-badges" id="gameBadges"></div>
+      </div>
+
+      <div class="game-res">
+        <div class="res-cell"><span>Blubber</span><strong id="blubberCount">0</strong></div>
+        <div class="res-cell"><span>Pro Klick</span><strong id="perClick">1</strong></div>
+      </div>
+
       <div class="evo-wrap"><div class="evo-fill" id="evoFill"></div></div>
-      <div class="evo-labels"><span>🐟 Magikarp</span><span id="evoPct">0%</span><span>🐉 Gyarados</span></div>
-      <div class="game-stats"><span>🫧 Blubber: <strong id="blubberCount">0</strong></span><span>Level: <strong id="levelLabel">Teich-Fisch</strong></span></div>
+      <div class="evo-labels">
+        <span id="stageLabel">🐟 Magikarp</span>
+        <span id="evoPct">0%</span>
+        <span id="nextStage">bis Gyarados: 50</span>
+      </div>
+
+      <div class="upg-list">
+        <div class="upg-head"><strong>🛒 Upgrades</strong><span id="upgHint">mehr Blubber = mehr Fisch</span></div>
+        <div id="upgContainer"></div>
+      </div>
+
       <div class="game-msg" id="gameMsg">Magikarp hat Hunger…</div>
+
+      <div class="game-actions">
+        <button class="btn btn-ghost btn-sm" type="button" onclick="doPrestige()">🌀 Neu starten</button>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="openUpgradeHelp()">❓ So geht's</button>
+      </div>
+
+      <div class="lb-box">
+        <div class="lb-title"><strong>🏆 Blubber-Leaderboard</strong><span id="lbCount">leer</span></div>
+        <form class="lb-form" id="lbForm" autocomplete="off" onsubmit="submitScore(event)">
+          <input class="lb-input" id="lbName" type="text" maxlength="15" placeholder="Dein Name (max. 15)"
+                 autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Name für das Leaderboard" />
+          <button class="lb-submit" type="submit" id="lbSubmit">Eintragen</button>
+        </form>
+        <p class="lb-hint" id="lbHint">Max. 15 Zeichen · nur Buchstaben, Zahlen, _ und - · keine Schimpfwörter</p>
+        <ol class="lb-list" id="lbList"></ol>
+        <div class="lb-foot">
+          <span>wird nur auf deinem Gerät gespeichert</span>
+          <button class="lb-clear" type="button" onclick="clearLeaderboard()">Liste löschen</button>
+        </div>
+      </div>
     </section>
 
     <!-- DM -->
@@ -604,9 +697,19 @@
   };
   function openModal(type){
     const d = MODALS[type] || MODALS.post;
-    document.getElementById("modalEmoji").textContent = d.emoji;
+    const emojiEl = document.getElementById("modalEmoji");
+    const textEl  = document.getElementById("modalText");
+    if(d.html){
+      emojiEl.innerHTML = d.html;              /* nur intern gesetzte, vertrauenswuerdige Bilder */
+      emojiEl.style.fontSize = "1rem";
+      textEl.style.display = "none";
+    } else {
+      emojiEl.textContent = d.emoji;
+      emojiEl.style.fontSize = "";
+      textEl.style.display = "";
+      textEl.innerHTML = d.text;
+    }
     document.getElementById("modalTitle").textContent = d.title;
-    document.getElementById("modalText").innerHTML = d.text;
     document.getElementById("twitchLink").style.display = d.hideTwitch ? "none" : "block";
     document.getElementById("modalBackdrop").classList.add("open");
   }
@@ -660,30 +763,456 @@
     else { showToast("📋 Befehl: !onlyfish"); }
   }
 
-  /* ---------- GAME ---------- */
-  let blubber = 0, evolved = false;
-  const MSGS = ["Magikarp hat Hunger…","Blub! Weiter so! 🫧","Er glänzt schon! ✨","Die Schuppen glitzern!","Fast geschafft…","Er zittert vor Evolution!"];
-  const LEVELS = [[0,"Teich-Fisch"],[10,"Splasher"],[25,"Kiemen-Fan"],[40,"Fast Gyarados"],[50,"GYARADOS 🐉"]];
-  function feedFish(e){
-    if(evolved){ showToast("🐉 Gyarados ist satt. Er will jetzt Streamen."); return; }
-    blubber++;
-    document.getElementById("blubberCount").textContent = blubber;
-    const pct = Math.min(100, Math.round(blubber/50*100));
-    document.getElementById("evoFill").style.width = pct+"%";
-    document.getElementById("evoPct").textContent = pct+"%";
-    let lvl = "Teich-Fisch";
-    LEVELS.forEach(([min,name])=>{ if(blubber>=min) lvl=name; });
-    document.getElementById("levelLabel").textContent = lvl;
-    document.getElementById("gameMsg").textContent = MSGS[Math.min(MSGS.length-1, Math.floor(blubber/10))];
-    splashBurst(e.clientX, e.clientY);
-    if(blubber===50){
-      evolved = true;
-      const f = document.getElementById("gameFish");
-      f.textContent = "🐉"; f.classList.add("evolved");
-      document.getElementById("gameMsg").textContent = "🐉 EVOLUTION! Gyarados ist da!";
-      confettiBurst(); openModal("evolved");
+  /* ---------- GAME: MAGIKARP TYCOON ---------- */
+  const GAME_KEY = "onlyfish.save.v2";
+  const LB_KEY   = "onlyfish.leaderboard.v1";
+  const LB_MAX   = 15;
+  const EVOLVE_AT = 50;
+
+  const UPGRADES = [
+    { id:"flosse",   icon:"🖐️", name:"Flossen-Power",  desc:"+1 Blubber pro Klick",
+      max:25, calc:(l)=>l,      cost:(l)=>Math.floor(15*Math.pow(1.85,l)) },
+    { id:"alge",     icon:"🌿", name:"Algen-Farm",      desc:"+1 Blubber pro Sekunde",
+      max:25, calc:(l)=>l,      cost:(l)=>Math.floor(40*Math.pow(1.9,l)) },
+    { id:"rudel",    icon:"🐠", name:"Fisch-Rudel",     desc:"+5 Blubber pro Sekunde",
+      max:20, calc:(l)=>l*5,    cost:(l)=>Math.floor(400*Math.pow(2.0,l)) },
+    { id:"aquarium", icon:"🫧", name:"Aquarium",        desc:"+25 Blubber pro Sekunde",
+      max:15, calc:(l)=>l*25,   cost:(l)=>Math.floor(5000*Math.pow(2.1,l)) },
+    { id:"krit",     icon:"⚡", name:"Kritische Welle", desc:"+10% Chance auf 10x Klick",
+      max:8, crit:true, calc:(l)=>l, cost:(l)=>Math.floor(750*Math.pow(2.4,l)) },
+  ];
+
+  const STAGES = [
+    [0,   "🐟 Magikarp",  "Teich-Fisch"],
+    [15,  "🐠 Magikarp",  "Splasher"],
+    [30,  "🐟 Magikarp+", "Kiemen-Fan"],
+    [50,  "🐉 Gyarados",  "GYARADOS"],
+    [150, "🐉 Gyarados",  "Gyarados Alpha"],
+    [500, "🌊 Gyarados",  "Sturm-Gyarados"],
+  ];
+
+  const state = { total:0, bank:0, ups:{}, clicks:0, evolved:false };
+  UPGRADES.forEach(u => state.ups[u.id] = 0);
+
+  function upLevel(id){ return state.ups[id] || 0; }
+  function upCost(u){ return u.cost(upLevel(u.id)); }
+  function isMaxed(u){ return upLevel(u.id) >= u.max; }
+  function perClick(){ return Math.max(1, 1 + UPGRADES[0].calc(upLevel("flosse"))); }
+  function critChance(){ return Math.min(0.8, 0.10 * upLevel("krit")); }
+  function perSecond(){
+    let v = 0;
+    UPGRADES.forEach(u => { if(u.id !== "flosse" && !u.crit) v += u.calc(upLevel(u.id)); });
+    return v;
+  }
+  function stageFor(total){
+    let cur = STAGES[0];
+    STAGES.forEach(st => { if(total >= st[0]) cur = st; });
+    return cur;
+  }
+  function nextStageFor(total){
+    for(const st of STAGES){ if(total < st[0]) return st; }
+    return null;
+  }
+
+  /* ---- Leaderboard: nur lokal, XSS-sicher ---- */
+  const BAD_WORDS = ["arschloch","arsch","scheiss","scheiße","scheisse","wichser","wichs","wixx","ficken","fick","hurensohn","hure","fotze","schwanz","penis","idiot","volldepp","depp","trottel","spast","missgeburt","nazi","hitler","porno","bitch","fuck","shit","cunt","nigger","nigga","retard","bastard","asshole","dickhead","dick","cock","pussy","whore","slut","schwuchtel","faggot","homo","nutte","kacke","kack","piss","penner","vollpfosten","wanker","boobs","cum","anal","titten","sex","xxx","porno"];
+  const LEET = {"0":"o","1":"i","3":"e","4":"a","5":"s","7":"t","8":"b","@":"a","$":"s","!":"i"};
+
+  function normalizeName(raw){
+    return String(raw == null ? "" : raw)
+      .slice(0, 200)
+      .toLowerCase()
+      .replace(/[\u0300-\u036f]/g, "")
+      .split("").map(ch => LEET[ch] || ch).join("")
+      .replace(/[^a-z]/g, "");
+  }
+
+  function validateName(raw){
+    const name = String(raw == null ? "" : raw).trim();
+    if(!name) return { ok:false, msg:"Bitte gib einen Namen ein." };
+    if(name.length > LB_MAX) return { ok:false, msg:"Maximal " + LB_MAX + " Zeichen." };
+    if(!/^[A-Za-z0-9ÄÖÜäöüß_-]+$/.test(name))
+      return { ok:false, msg:"Nur Buchstaben, Zahlen, _ und - erlaubt." };
+    if(!/[A-Za-zÄÖÜäöüß]/.test(name))
+      return { ok:false, msg:"Bitte mindestens einen Buchstaben verwenden." };
+    if(/(.)\1{4,}/.test(name))
+      return { ok:false, msg:"Zu viele gleiche Zeichen hintereinander." };
+    /* Wortgrenzen: verhindert False Positives wie "Scunthorpe" oder "Analytics",
+       blockt aber "KevinArsch" und "Arschloch88" weiterhin zuverlaessig. */
+    const normLeet  = normalizeName(name);
+    const normPlain = name.toLowerCase().replace(/[\u0300-\u036f]/g,"").replace(/[^a-z]/g,"");
+    for(const bad of BAD_WORDS){
+      const b = normalizeName(bad);
+      if(!b) continue;
+      const re = new RegExp("(^|[^a-z])" + b + "([^a-z]|$)");
+      if(re.test(normLeet) || re.test(normPlain))
+        return { ok:false, msg:"Der Name enthält ein unpassendes Wort." };
+    }
+    return { ok:true, value:name };
+  }
+
+  const LB_MAX_SCORE = 1e12;
+
+  function loadLB(){
+    try{
+      const raw = localStorage.getItem(LB_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      if(!Array.isArray(arr)) return [];
+      const out = [];
+      const seen = new Set();
+      for(const e of arr){
+        if(!e || typeof e.name !== "string") continue;
+        /* Namen aus dem Speicher erneut pruefen: manipulierte Daten werden verworfen */
+        const v = validateName(e.name);
+        if(!v.ok) continue;
+        const key = v.value.toLowerCase();
+        if(seen.has(key)) continue;
+        seen.add(key);
+        let score = Number(e.score);
+        if(!Number.isFinite(score) || score < 0) score = 0;
+        out.push({ name: v.value, score: Math.min(LB_MAX_SCORE, Math.floor(score)) });
+        if(out.length >= 100) break;
+      }
+      return out;
+    }catch(e){ return []; }
+  }
+  function saveLB(list){
+    try{ localStorage.setItem(LB_KEY, JSON.stringify(list.slice(0,100))); }catch(e){}
+  }
+  function sortedLB(){
+    return loadLB().sort((a,b) => b.score - a.score || a.name.localeCompare(b.name));
+  }
+  function addScore(name, score){
+    const list = loadLB();
+    const key = name.toLowerCase();
+    const existing = list.find(e => e.name.toLowerCase() === key);
+    if(existing){ if(score > existing.score) existing.score = score; }
+    else { list.push({ name, score }); }
+    saveLB(list);
+    return sortedLB();
+  }
+
+  function renderLeaderboard(){
+    const listEl  = document.getElementById("lbList");
+    const countEl = document.getElementById("lbCount");
+    if(!listEl) return;
+    const list = sortedLB().slice(0, 20);
+    const me = (function(){ try{ return localStorage.getItem("onlyfish.me") || ""; }catch(e){ return ""; } })();
+    if(countEl) countEl.textContent = list.length ? list.length + (list.length === 1 ? " Eintrag" : " Einträge") : "leer";
+    if(!list.length){
+      listEl.innerHTML = '<li class="lb-empty">Noch niemand hier. Sei der erste Fisch! 🐟</li>';
+      return;
+    }
+    const medals = ["🥇","🥈","🥉"];
+    listEl.innerHTML = "";
+    list.forEach((e, i) => {
+      const li  = document.createElement("li");
+      li.className = "lb-item" + (me && e.name === me ? " me" : "");
+      const pos = document.createElement("span");
+      pos.className = "lb-pos";
+      pos.textContent = medals[i] || String(i+1);
+      const nm  = document.createElement("span");
+      nm.className = "lb-name";
+      nm.textContent = e.name;          /* textContent -> kein HTML-Injection möglich */
+      nm.title = e.name;
+      const sc  = document.createElement("span");
+      sc.className = "lb-score";
+      sc.textContent = e.score.toLocaleString("de-DE") + " 🫧";
+      li.append(pos, nm, sc);
+      listEl.appendChild(li);
+    });
+  }
+
+  function submitScore(ev){
+    if(ev) ev.preventDefault();
+    const input = document.getElementById("lbName");
+    const hint  = document.getElementById("lbHint");
+    const res = validateName(input.value);
+    if(!res.ok){
+      input.classList.add("bad");
+      setTimeout(() => input.classList.remove("bad"), 420);
+      if(hint) hint.textContent = "⚠️ " + res.msg;
+      return;
+    }
+    addScore(res.value, Math.floor(state.total));
+    try{ localStorage.setItem("onlyfish.me", res.value); }catch(e){}
+    input.value = "";
+    if(hint) hint.textContent = "✅ " + res.value + " steht im Leaderboard!";
+    renderLeaderboard();
+    showToast("🏆 " + res.value + ": " + Math.floor(state.total).toLocaleString("de-DE") + " Blubber");
+  }
+
+  function clearLeaderboard(){
+    if(!confirm("Leaderboard auf diesem Gerät wirklich leeren?")) return;
+    saveLB([]);
+    try{ localStorage.removeItem("onlyfish.me"); }catch(e){}
+    renderLeaderboard();
+    showToast("🧹 Leaderboard geleert.");
+  }
+
+  /* ---- Rendering ---- */
+  function fmt(n){
+    n = Math.floor(n);
+    if(n >= 1e9) return (n/1e9).toFixed(2).replace(/\.?0+$/,"") + " Mrd";
+    if(n >= 1e6) return (n/1e6).toFixed(2).replace(/\.?0+$/,"") + " Mio";
+    if(n >= 1e4) return (n/1e3).toFixed(1).replace(/\.0$/,"") + "K";
+    return n.toLocaleString("de-DE");
+  }
+
+  function renderUpgrades(){
+    const box = document.getElementById("upgContainer");
+    if(!box) return;
+    box.innerHTML = "";
+    UPGRADES.forEach(u => {
+      const maxed = isMaxed(u);
+      const cost  = upCost(u);
+      const btn = document.createElement("button");
+      btn.className = "upg";
+      btn.type = "button";
+      btn.disabled = maxed || state.bank < cost;
+      btn.onclick = () => buyUpgrade(u.id);
+
+      const icon = document.createElement("span");
+      icon.className = "upg-icon"; icon.textContent = u.icon;
+
+      const body = document.createElement("span");
+      body.className = "upg-body";
+      const nm = document.createElement("span");
+      nm.className = "upg-name";
+      nm.textContent = u.name;
+      const lv = document.createElement("span");
+      lv.className = "upg-lvl";
+      lv.textContent = "Lv " + upLevel(u.id) + "/" + u.max;
+      nm.appendChild(lv);
+      const desc = document.createElement("span");
+      desc.className = "upg-desc";
+      desc.textContent = u.desc + (u.crit ? " · aktuell " + Math.round(critChance()*100) + "%" : "");
+      body.append(nm, desc);
+
+      const price = document.createElement("span");
+      price.className = "upg-cost" + (maxed ? " maxed" : "");
+      price.textContent = maxed ? "MAX" : fmt(cost).replace(/\s/g,"") + " 🫧";
+
+      btn.append(icon, body, price);
+      box.appendChild(btn);
+    });
+  }
+
+  function renderGame(){
+    const st = stageFor(state.total);
+    const nx = nextStageFor(state.total);
+
+    const bankEl = document.getElementById("blubberCount");
+    if(bankEl) bankEl.textContent = fmt(state.bank);
+    const pcEl = document.getElementById("perClick");
+    if(pcEl) pcEl.textContent = fmt(perClick());
+
+    const pct = Math.min(100, Math.round(state.total / EVOLVE_AT * 100));
+    const fill = document.getElementById("evoFill");
+    if(fill){
+      fill.style.width = pct + "%";
+      fill.classList.toggle("done", state.total >= EVOLVE_AT);
+    }
+    const pctEl = document.getElementById("evoPct");
+    if(pctEl) pctEl.textContent = state.total >= EVOLVE_AT ? "✅ 100%" : pct + "%";
+    const stageEl = document.getElementById("stageLabel");
+    if(stageEl) stageEl.textContent = st[1];
+    const nxtEl = document.getElementById("nextStage");
+    if(nxtEl) nxtEl.textContent = nx
+      ? "noch " + fmt(nx[0] - state.total)
+      : "max. Stufe 🐉";
+
+    if(state.total >= EVOLVE_AT) applyGyarados();
+
+    const badges = document.getElementById("gameBadges");
+    if(badges){
+      badges.innerHTML = "";
+      const add = (txt, hot) => {
+        const b = document.createElement("span");
+        b.className = "gb" + (hot ? " hot" : "");
+        b.textContent = txt;
+        badges.appendChild(b);
+      };
+      if(perSecond() > 0) add("+" + fmt(perSecond()) + "/s", false);
+      if(critChance() > 0) add("⚡ " + Math.round(critChance()*100) + "% Krit", false);
+      if(state.total >= EVOLVE_AT) add("🐉 entwickelt", true);
+    }
+    renderUpgrades();
+  }
+
+  function applyGyarados(){
+    const fish = document.getElementById("gameFish");
+    const img  = document.getElementById("gameFishImg");
+    if(fish) fish.classList.add("evolved");
+    if(img && img.dataset.gya !== "1"){
+      img.src = "assets/gyarados-avatar.jpg";
+      img.dataset.gya = "1";
+      img.alt = "Gyarados füttern";
     }
   }
+
+  let gameMsgTimer;
+  function setGameMsg(txt){
+    const el = document.getElementById("gameMsg");
+    if(!el) return;
+    el.textContent = txt;
+    clearTimeout(gameMsgTimer);
+    gameMsgTimer = setTimeout(() => {
+      el.textContent = state.total >= EVOLVE_AT ? "Gyarados bewacht den Teich. 🐉" : "Magikarp hat Hunger…";
+    }, 4000);
+  }
+
+  function floatNumber(x, y, txt, crit){
+    const el = document.createElement("span");
+    el.className = "float-num";
+    el.textContent = txt;
+    el.style.left = x + "px";
+    el.style.top  = y + "px";
+    if(crit){ el.style.color = "#e11d48"; el.style.fontSize = "1.3rem"; }
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 950);
+  }
+
+  function feedFish(e){
+    const crit = Math.random() < critChance();
+    const amount = perClick() * (crit ? 10 : 1);
+    state.bank  += amount;
+    state.total += amount;
+    state.clicks++;
+
+    if(e && e.clientX){
+      const fish = document.getElementById("gameFish");
+      if(fish){
+        const r = fish.getBoundingClientRect();
+        floatNumber(r.left + r.width/2 - 16, r.top + 6, "+" + fmt(amount), crit);
+      }
+      splashBurst(e.clientX, e.clientY);
+    }
+    if(crit) setGameMsg("⚡ KRITISCHE WELLE! 10x Blubber!");
+    else if(state.clicks % 11 === 0) setGameMsg("Blub! Der Teich brodelt. 🫧");
+
+    checkEvolution();
+    renderGame();
+    saveGameThrottled();
+  }
+
+  function checkEvolution(){
+    if(state.evolved || state.total < EVOLVE_AT) return;
+    state.evolved = true;
+    confettiBurst();
+    applyGyarados();
+    setGameMsg("🐉 EVOLUTION! Magikarp ist jetzt Gyarados!");
+    const d = MODALS.evolved;
+    if(d){
+      d.html = '<img src="assets/gyarados.jpg" alt="Gyarados auf seinem rosa Herz-Kissen" style="width:100%;max-width:250px;border-radius:16px;margin:0 auto 14px;display:block;box-shadow:0 12px 30px rgba(2,44,74,.25)" />' + d.text;
+      openModal("evolved");
+    }
+    saveGame();
+  }
+
+  function buyUpgrade(id){
+    const u = UPGRADES.find(x => x.id === id);
+    if(!u || isMaxed(u)) return;
+    const cost = upCost(u);
+    if(state.bank < cost){
+      setGameMsg("Zu wenig Blubber – es fehlen " + fmt(cost - state.bank) + ".");
+      return;
+    }
+    state.bank -= cost;
+    state.ups[id] = upLevel(id) + 1;
+    setGameMsg(u.icon + " " + u.name + " auf Level " + upLevel(id) + "!");
+    renderGame();
+    saveGameThrottled();
+  }
+
+  function doPrestige(){
+    if(state.total < 100){
+      showToast("🌀 Ab 100 gesammelten Blubber kannst du neu starten. Dein Leaderboard-Eintrag bleibt.");
+      return;
+    }
+    if(!confirm("Neu starten? Upgrades und Blubber gehen verloren, dein Leaderboard-Eintrag bleibt.")) return;
+    state.bank = 0; state.total = 0; state.clicks = 0; state.evolved = false;
+    UPGRADES.forEach(u => state.ups[u.id] = 0);
+    const img = document.getElementById("gameFishImg");
+    if(img){ img.src = "assets/magikarp-avatar.jpg"; delete img.dataset.gya; img.alt = "Magikarp Mike füttern"; }
+    const fish = document.getElementById("gameFish");
+    if(fish) fish.classList.remove("evolved");
+    renderGame();
+    saveGame();
+    showToast("🌀 Frischer Teich, neues Glück!");
+  }
+
+  function openUpgradeHelp(){
+    MODALS.help = { emoji:"🎮", title:"Magikarp Tycoon", hideTwitch:true,
+      text:
+        "<strong>1. Klicken</strong> bringt Blubber. <em>Flossen-Power</em> erhöht den Betrag pro Klick.<br><br>" +
+        "<strong>2. Upgrades</strong> findest du direkt unter dem Fisch. <em>Algen-Farm</em>, <em>Fisch-Rudel</em> und <em>Aquarium</em> produzieren automatisch Blubber, auch wenn du gerade nicht klickst.<br><br>" +
+        "<strong>3. Kritische Welle:</strong> 10 % Chance pro Level auf 10-fachen Klick.<br><br>" +
+        "<strong>4. Bei 50 Blubber</strong> entwickelt sich Magikarp zu Gyarados und bleibt es auch. Danach kommen weitere Stufen bis zum Sturm-Gyarados.<br><br>" +
+        "<strong>5. Leaderboard:</strong> Namen eintragen, fertig. Max. 15 Zeichen, nur Buchstaben, Zahlen, _ und -. Alles bleibt lokal in deinem Browser." };
+    openModal("help");
+  }
+
+  /* ---- Speichern ---- */
+  function saveGame(){
+    try{
+      localStorage.setItem(GAME_KEY, JSON.stringify({
+        bank: state.bank, total: state.total, ups: state.ups,
+        clicks: state.clicks, evolved: state.evolved, t: Date.now()
+      }));
+    }catch(e){}
+  }
+  let saveTimer;
+  function saveGameThrottled(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveGame, 400);
+  }
+  function loadGame(){
+    try{
+      const raw = localStorage.getItem(GAME_KEY);
+      if(!raw) return;
+      const d = JSON.parse(raw);
+      if(!d || typeof d !== "object") return;
+      state.bank   = Math.max(0, Math.floor(Number(d.bank)   || 0));
+      state.total  = Math.max(0, Math.floor(Number(d.total)  || 0));
+      state.clicks = Math.max(0, Math.floor(Number(d.clicks) || 0));
+      state.evolved = !!d.evolved;
+      if(d.ups && typeof d.ups === "object"){
+        UPGRADES.forEach(u => {
+          const v = Math.floor(Number(d.ups[u.id]) || 0);
+          state.ups[u.id] = Math.min(u.max, Math.max(0, v));
+        });
+      }
+    }catch(e){}
+  }
+
+  /* ---- Passives Einkommen ---- */
+  let lastTick = Date.now();
+  setInterval(() => {
+    const now = Date.now();
+    const dt = Math.min(5, (now - lastTick)/1000);   /* Tab im Hintergrund nicht überbelohnen */
+    lastTick = now;
+    const gain = perSecond() * dt;
+    if(gain > 0){
+      const before = Math.floor(state.bank);
+      state.bank  += gain;
+      state.total += gain;
+      if(Math.floor(state.bank) !== before){ renderGame(); checkEvolution(); }
+      saveGameThrottled();
+    }
+  }, 1000);
+
+  document.addEventListener("keydown", (e) => {
+    const el = document.activeElement;
+    if(el && el.id === "gameFish" && (e.key === " " || e.key === "Enter")){
+      e.preventDefault();
+      feedFish({ clientX:0, clientY:0 });
+    }
+  });
+
+  loadGame();
+  renderGame();
+  renderLeaderboard();
 
   /* ---------- DM BOT ---------- */
   const REPLIES = ["Blub. 🫧","Interessant. Erzähl mehr. Oder füttere mich. 🐟","Ich habe gerade meine Schuppen poliert. ✨","Kein Angelhaken in dieser DM. Versprochen. 🚫🪝","Magikarp! Magikarp! (Das heißt: Danke fürs Schreiben.)","Willst du mich abonnieren oder nur blubbern? 😏","Mein Kiemen-Content ist legendär. Fast wie mein Stream."];
@@ -755,9 +1284,9 @@
      Mit eigenen Credentials (siehe README) laeuft alles ueber die offizielle Helix-API.
      ACHTUNG: Auf einer rein statischen Seite ist ein Client-Secret nie wirklich geheim.
      Fuer einen oeffentlichen Gag-Link reicht der Fallback voellig aus. */
-  const TWITCH_CLIENT_ID = "";       // <- Client-ID eintragen (optional)
-  const TWITCH_ACCESS_TOKEN = "";    // <- App Access Token eintragen (optional)
-  const TWITCH_HELIX = "https://api.twitch.tv/helix/streams?user_login=dombledore1337";
+  const DECAPI_UPTIME = "https://decapi.me/twitch/uptime/dombledore1337";
+  const DECAPI_GAME   = "https://decapi.me/twitch/game/dombledore1337";
+  const DECAPI_TITLE  = "https://decapi.me/twitch/title/dombledore1337";
 
   /* ---------- COUNTDOWN (naechster Stream 22:30) ---------- */
   (function(){
@@ -783,9 +1312,6 @@
   /* ---------- LIVE STATUS ---------- */
   const LIVE = { state:"unknown", checked:null, isLive:false, title:"", game:"", viewers:0, startedAt:null };
 
-  function fmtViewers(n){
-    return (n||0).toLocaleString("de-DE");
-  }
   function fmtUptime(iso){
     if(!iso) return "–";
     const d = Date.now() - new Date(iso).getTime();
@@ -823,14 +1349,13 @@
       t.textContent = "„" + (LIVE.title || "Ohne Titel im Teich") + "“";
       document.getElementById("liveDetails").classList.remove("hidden");
       document.getElementById("liveGame").textContent = LIVE.game || "Unbekannt";
-      document.getElementById("liveViewers").textContent = LIVE.viewers ? fmtViewers(LIVE.viewers) : "–";
       document.getElementById("liveUptime").textContent = fmtUptime(LIVE.startedAt);
       nextLine.classList.add("hidden");
       embedBtn.classList.remove("hidden");
 
       heroDot.className = "live-dot";
       heroText.innerHTML = "<strong>JETZT LIVE</strong> · dombledore1337 ist am Blubbern" +
-        (LIVE.viewers ? " · " + fmtViewers(LIVE.viewers) + " Zuschauer" : "");
+        (LIVE.game ? " · " + LIVE.game : "");
       if(profileStatus){ profileStatus.textContent = "● Gerade live am Blubbern"; }
     } else if(LIVE.state === "unknown"){
       dot.className = "live-dot off";
@@ -865,36 +1390,38 @@
     }
   }
 
-  async function fetchHelix(){
-    if(!TWITCH_CLIENT_ID || !TWITCH_ACCESS_TOKEN) throw new Error("no credentials");
-    const res = await fetch(TWITCH_HELIX, {
-      headers: { "Client-ID": TWITCH_CLIENT_ID, "Authorization": "Bearer " + TWITCH_ACCESS_TOKEN }
-    });
-    if(!res.ok) throw new Error("helix " + res.status);
-    const json = await res.json();
-    return (json.data && json.data[0]) || null;
-  }
-
-  /* Fallback 1: decapi.me (liefert "offline" oder die Live-Zeit) */
+  /* decapi.me liefert Klartext: "2 hours 15 mins" oder "dombledore1337 is offline" */
   async function fetchDecapi(){
-    const res = await fetch("https://decapi.me/twitch/uptime/dombledore1337?t=" + Date.now());
-    if(!res.ok) throw new Error("decapi " + res.status);
-    const txt = (await res.text()).trim();
-    if(!txt || /offline|not live|error/i.test(txt)) return null;
-    // "1 hours 20 mins" -> grobe Startzeit
-    const hm = txt.match(/(\d+)\s*hour/i), mm = txt.match(/(\d+)\s*min/i);
-    const ms = (hm ? +hm[1]*3600000 : 0) + (mm ? +mm[1]*60000 : 0);
-    return { title: "", game: "", viewers: 0, started_at: new Date(Date.now() - ms).toISOString() };
-  }
+    const bust = "?t=" + Date.now();
+    const [upRes, gameRes, titleRes] = await Promise.allSettled([
+      fetch(DECAPI_UPTIME + bust),
+      fetch(DECAPI_GAME + bust),
+      fetch(DECAPI_TITLE + bust),
+    ]);
 
-  /* Fallback 2: ivr.fi (rein oeffentlich, CORS-freundlich) */
-  async function fetchIvr(){
-    const res = await fetch("https://api.ivr.fi/v2/twitch/user?login=dombledore1337&t=" + Date.now());
-    if(!res.ok) throw new Error("ivr " + res.status);
-    const json = await res.json();
-    const u = Array.isArray(json) ? json[0] : json;
-    if(!u || !u.live) return null;
-    return { title: u.title || "", game: u.game || "", viewers: 0, started_at: u.liveAt || null };
+    if(upRes.status !== "fulfilled" || !upRes.value.ok) throw new Error("decapi unreachable");
+    const uptime = (await upRes.value.text()).trim();
+    if(!uptime || /offline|not live|no data|error/i.test(uptime)) return null;
+
+    let game = "", title = "";
+    if(gameRes.status === "fulfilled" && gameRes.value.ok){
+      game = (await gameRes.value.text()).trim();
+      if(/offline|not live|no data/i.test(game)) game = "";
+    }
+    if(titleRes.status === "fulfilled" && titleRes.value.ok){
+      title = (await titleRes.value.text()).trim();
+      if(/offline|not live|no data/i.test(title)) title = "";
+    }
+
+    const hm = uptime.match(/(\d+)\s*hour/i);
+    const mm = uptime.match(/(\d+)\s*min/i);
+    const ms = (hm ? +hm[1]*3600000 : 0) + (mm ? +mm[1]*60000 : 0);
+
+    return {
+      title, game, viewers: 0,
+      started_at: new Date(Date.now() - ms).toISOString(),
+      uptimeText: uptime
+    };
   }
 
   async function refreshLive(manual){
@@ -905,20 +1432,22 @@
     LIVE.state = "checking";
     setLiveUI();
 
-    const chain = [fetchHelix, fetchDecapi, fetchIvr];
     let data = null, ok = false;
-    for(const fn of chain){
-      try { data = await fn(); ok = true; break; }
-      catch(err){ /* naechster Fallback */ }
+    try{
+      data = await fetchDecapi();
+      ok = true;
+    }catch(err){
+      ok = false;
     }
 
     if(ok){
       LIVE.state = data ? "live" : "offline";
       LIVE.isLive = !!data;
       LIVE.title = data?.title || "";
-      LIVE.game = data?.game || "";
-      LIVE.viewers = data?.viewers || 0;
+      LIVE.game  = data?.game  || "";
+      LIVE.viewers = 0;
       LIVE.startedAt = data?.started_at || null;
+      LIVE.uptimeText = data?.uptimeText || "";
     } else {
       LIVE.state = "unknown";
       LIVE.isLive = false;
@@ -926,9 +1455,12 @@
     setLiveUI();
     if(btn) btn.classList.remove("spin");
     if(manual) showToast(LIVE.state === "unknown"
-      ? "🌊 Status gerade nicht abrufbar – Twitch-API nicht erreichbar."
+      ? "🌊 decapi.me gerade nicht erreichbar – versuch's gleich nochmal."
       : (LIVE.isLive ? "🔴 Live! Ab in den Stream." : "⚪ Offline. Um 22:30 geht's weiter."));
   }
+
+  refreshLive(false);
+  setInterval(() => refreshLive(false), CHECK_INTERVAL);
 
   function toggleEmbed(){
     const wrap = document.getElementById("liveEmbedWrap");

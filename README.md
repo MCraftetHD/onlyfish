@@ -35,33 +35,58 @@ Der Bot antwortet mit dem Link zu dieser Seite.
 - 🎮 **Füttere Magikarp:** 50 Klicks → Evolution zu Gyarados 🐉
 - 💬 Fake-DM mit Auto-Antworten („Blub.")
 - 📋 `!onlyfish` kopieren, Countdown zum nächsten Stream (22:30 Uhr)
-- 🔴 **Echter Live-Status** von Twitch (live/offline, Spiel, Zuschauer, Uptime) + optionaler Stream-Embed
+- 🔴 **Echter Live-Status** über decapi.me (live/offline, Spiel, Titel, Uptime) + optionaler Stream-Embed
+- 🎮 **Magikarp Tycoon:** Klicker mit 5 Upgrades, passivem Einkommen, kritischen Treffern, Evolutionsstufen und Prestige
+- 🏆 **Blubber-Leaderboard:** Name eintragen (max. 15 Zeichen, gefiltert), Speicherung lokal im Browser
 - Blasen-Animation, Splash-Effekte, Konfetti
 
-## 🔴 Live-Status (Twitch)
+## 🔴 Live-Status (decapi.me)
 
-Die Seite zeigt in der Sidebar und im Hero an, ob dombledore1337 gerade live ist – mit Spiel, Zuschauerzahl und Uptime. Alle 60 Sekunden wird neu geladen, dazu gibt es einen manuellen Refresh-Button.
+Sidebar und Hero zeigen an, ob dombledore1337 gerade live ist – mit Spiel, Stream-Titel und Uptime. Alle 60 Sekunden wird neu geladen, dazu gibt es einen manuellen Refresh-Button.
 
-**Ohne Einrichtung** funktioniert das sofort: Es werden öffentliche Status-APIs abgefragt (decapi.me, dann ivr.fi). Das ist CORS-freundlich und braucht keinen Key – ideal für GitHub Pages.
+Die Seite fragt dafür **[decapi.me](https://decapi.me/twitch/) ab**, und zwar drei Endpunkte:
 
-**Eigene Twitch-API (optional, mehr Details):** Trage in `index.html` oben im Script-Block deine Werte ein:
-
-```js
-const TWITCH_CLIENT_ID = "deine-client-id";
-const TWITCH_ACCESS_TOKEN = "dein-app-access-token";
+```
+https://decapi.me/twitch/uptime/dombledore1337
+https://decapi.me/twitch/game/dombledore1337
+https://decapi.me/twitch/title/dombledore1337
 ```
 
-So bekommst du es:
-1. [dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps) → „Register your application", Typ **Public**
-2. Client-ID kopieren
-3. App Access Token holen (gültig ~60 Tage):
-   ```
-   POST https://id.twitch.tv/oauth2/token?client_id=DEINE_ID&client_secret=DEIN_SECRET&grant_type=client_credentials
-   ```
+Kein API-Key, kein Secret, CORS-freundlich – läuft direkt auf GitHub Pages. Ist der Dienst gerade nicht erreichbar, zeigt die Seite ehrlich „Status unbekannt" statt fälschlich „Offline".
 
-⚠️ **Wichtig:** Ein Twitch-Client-Secret in einer statischen Seite ist nie wirklich geheim. Wer den Quellcode liest, sieht es. Für einen Gag-Link reicht der öffentliche Fallback völlig aus – nutze eigene Credentials nur, wenn dir das egal ist oder die Seite hinter einem Login liegt. Den App Access Token (nicht das Secret!) sieht man zwar auch, aber er läuft nach ~60 Tagen ab und hat nur Lesezugriff.
+**Hinweis:** decapi liefert keine Zuschauerzahl. Deshalb zeigt die Karte nur Spiel, Titel und Uptime.
 
-**Stream einbetten:** Wenn er live ist, erscheint im Live-Status ein Button „▶️ Einbetten". Der Player wird erst auf Klick geladen (kein Autoplay-Stress) und nutzt automatisch deinen Hostnamen als Twitch-`parent`.
+**Stream einbetten:** Wenn er live ist, erscheint im Live-Status ein Button „▶️ Einbetten". Der Player lädt erst auf Klick und nutzt automatisch deinen Hostnamen als Twitch-`parent`.
+
+## 🎮 Magikarp Tycoon
+
+Der Klicker in der Sidebar ist ein kleines Idle-Game:
+
+| Upgrade | Wirkung | Startpreis |
+|---|---|---|
+| 🖐️ Flossen-Power | +1 Blubber pro Klick | 15 |
+| 🌿 Algen-Farm | +1 Blubber pro Sekunde | 40 |
+| 🐠 Fisch-Rudel | +5 Blubber pro Sekunde | 400 |
+| 🫧 Aquarium | +25 Blubber pro Sekunde | 5.000 |
+| ⚡ Kritische Welle | +10 % Chance auf 10× Klick | 750 |
+
+- Preise steigen pro Level (Faktor ~1,9–2,4), jedes Upgrade hat ein Max-Level
+- **Evolution bei 50 Blubber** → Magikarp wird Gyarados, danach weitere Stufen bis Sturm-Gyarados (500)
+- Fortschritt wird in `localStorage` gespeichert und beim nächsten Besuch geladen
+- **Neu starten** (Prestige) ab 100 gesammelten Blubber – der Leaderboard-Eintrag bleibt
+
+## 🏆 Leaderboard
+
+Name eintragen, fertig. Gespeichert wird **lokal in deinem Browser** (`localStorage`), nicht auf einem Server.
+
+**Validierung des Namens:**
+- maximal **15 Zeichen**
+- nur Buchstaben (inkl. Umlaute), Zahlen, `_` und `-`
+- keine Schimpfwörter – geprüft gegen eine Liste inkl. Leetspeak-Varianten (`4rsch`, `f1ck` …) und Wortgrenzen, damit Namen wie „Scunthorpe" nicht fälschlich blockiert werden
+- Ausgabe ausschließlich über `textContent`, also kein HTML/JS-Injection möglich
+- Einträge aus dem Speicher werden beim Laden erneut geprüft; manipulierte Daten werden verworfen, Punktzahlen auf sinnvolle Werte geklemmt
+
+Gleicher Name = nur der höhere Score zählt. Über „Liste löschen" kann man die lokale Liste zurücksetzen.
 
 ## ⚠️ Hinweis
 
