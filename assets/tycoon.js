@@ -12,8 +12,11 @@
   var $ = function (id) { return document.getElementById(id); };
 
   /** Zahl kompakt formatieren: 1.234.567 -> "1,23 Mio" */
+  var UNITS = [
+    [1e15, "Brd"], [1e12, "Bio"], [1e9, "Mrd"], [1e6, "Mio"]
+  ];
   function fmt(n) {
-    if (!isFinite(n)) return "0";
+    if (typeof n !== "number" || !isFinite(n)) return "0";
     var neg = n < 0;
     n = Math.abs(n);
     var out;
@@ -21,15 +24,19 @@
       out = (n < 10 && Math.floor(n) !== n) ? n.toFixed(1).replace(".", ",") : String(Math.floor(n));
     } else if (n < 1e6) {
       out = Math.floor(n).toLocaleString("de-DE");
-    } else if (n < 1e9) {
-      out = (n / 1e6).toFixed(2).replace(".", ",") + " Mio";
-    } else if (n < 1e12) {
-      out = (n / 1e9).toFixed(2).replace(".", ",") + " Mrd";
-    } else if (n < 1e15) {
-      out = (n / 1e12).toFixed(2).replace(".", ",") + " Bio";
+    } else if (n < 1e18) {
+      out = null;
+      for (var i = 0; i < UNITS.length; i++) {
+        if (n >= UNITS[i][0]) {
+          out = (n / UNITS[i][0]).toFixed(2).replace(".", ",") + " " + UNITS[i][1];
+          break;
+        }
+      }
     } else {
-      out = (n / 1e15).toFixed(2).replace(".", ",") + " Brd";
+      /* Ab 1e18 wird jede Einheit unlesbar - dann wissenschaftlich mit Komma. */
+      out = n.toExponential(2).replace(".", ",").replace("e+", " \u00D7 10^");
     }
+    if (out === null || out === undefined) out = Math.floor(n).toLocaleString("de-DE");
     return (neg ? "-" : "") + out;
   }
 
@@ -59,14 +66,16 @@
 
   /* Gebaeude: produzieren passiv. Kosten steigen um 15 % pro Stueck. */
   var BUILDINGS = [
-    { id: "flosse",   icon: "\u{1F590}", name: "Flossen-Betrieb",     base: 15,        cps: 0.1,    desc: "Ein Magikarp wedelt zart. +0,1/s" },
-    { id: "algen",    icon: "\u{1F33F}", name: "Algen-Farm",          base: 100,       cps: 1,      desc: "Grüne Sole, grünes Geld. +1/s" },
-    { id: "teich",    icon: "\u{1F4A7}", name: "Schaum-Teich",        base: 1100,      cps: 8,      desc: "Sprudelt vor sich hin. +8/s" },
-    { id: "rudel",    icon: "\u{1F420}", name: "Fisch-Rudel",         base: 12000,     cps: 47,     desc: "Schwarmarbeit lohnt sich. +47/s" },
-    { id: "aquarium", icon: "\u{1FAD7}", name: "Glas-Aquarium",       base: 130000,    cps: 260,    desc: "Schau-Fisch mit Zuschauern. +260/s" },
-    { id: "koralle",  icon: "\u{1FAB8}", name: "Korallen-Riff",       base: 1.4e6,     cps: 1400,   desc: "Hart, bunt, profitabel. +1,4K/s" },
-    { id: "tiefsee",  icon: "\u{1F30A}", name: "Tiefsee-Anlage",      base: 2e7,       cps: 7800,   desc: "Druckfest und rentabel. +7,8K/s" },
-    { id: "legende",  icon: "\u{1F409}", name: "Gyarados-Legende",    base: 3.3e8,     cps: 44000,  desc: "Ein Mythos arbeitet für dich. +44K/s" }
+    { id: "flosse",   icon: "\u{1F590}", name: "Flossen-Betrieb",     base: 15,        cps: 0.1,     desc: "Ein Magikarp wedelt zart. +0,1/s" },
+    { id: "algen",    icon: "\u{1F33F}", name: "Algen-Farm",          base: 100,       cps: 1,       desc: "Grüne Sole, grünes Geld. +1/s" },
+    { id: "teich",    icon: "\u{1F4A7}", name: "Schaum-Teich",        base: 1100,      cps: 8,       desc: "Sprudelt vor sich hin. +8/s" },
+    { id: "rudel",    icon: "\u{1F420}", name: "Fisch-Rudel",         base: 12000,     cps: 47,      desc: "Schwarmarbeit lohnt sich. +47/s" },
+    { id: "aquarium", icon: "\u{1FAD7}", name: "Glas-Aquarium",       base: 130000,    cps: 260,     desc: "Schau-Fisch mit Zuschauern. +260/s" },
+    { id: "koralle",  icon: "\u{1FAB8}", name: "Korallen-Riff",       base: 1.4e6,     cps: 1400,    desc: "Hart, bunt, profitabel. +1,4K/s" },
+    { id: "tiefsee",  icon: "\u{1F30A}", name: "Tiefsee-Anlage",      base: 1.4e7,     cps: 7800,    desc: "Druckfest und rentabel. +7,8K/s" },
+    { id: "legende",  icon: "\u{1F409}", name: "Gyarados-Legende",    base: 1.4e8,     cps: 44000,   desc: "Ein Mythos arbeitet für dich. +44K/s" },
+    { id: "ozean",    icon: "\u{1F30D}", name: "Welt-Ozean",          base: 1.4e9,     cps: 260000,  desc: "Sieben Meere, ein Besitzer. +260K/s" },
+    { id: "kosmos",   icon: "\u{1F680}", name: "Kosmos-Teich",        base: 1.4e10,    cps: 1.6e6,   desc: "Fische im Orbit. Absurd. +1,6Mio/s" }
   ];
   var BUILDING_BY_ID = {};
   BUILDINGS.forEach(function (b) { BUILDING_BY_ID[b.id] = b; });
@@ -103,28 +112,70 @@
   CLICK_UPGRADES.concat(BUILDING_UPGRADES).forEach(function (u) { UPGRADE_BY_ID[u.id] = u; });
 
   /* Erfolge: jeweils mit Belohnung in Prozent (Bonus auf CPS). */
+  /* Jeder Erfolg hat:
+     test(s)  -> ist er geschafft?
+     metric   -> aktueller Wert fuer den Fortschrittsbalken (optional)
+     goal     -> Zielwert fuer den Fortschrittsbalken (optional) */
   var ACHIEVEMENTS = [
-    { id: "a_first",   icon: "\u{1F41F}", name: "Erster Blubber",       desc: "Klicke 1-mal",                    test: function (s) { return s.clicks >= 1; },   bonus: 0 },
-    { id: "a_100",     icon: "\u{1F44B}", name: "Klick-Fisch",          desc: "100 Klicks",                      test: function (s) { return s.clicks >= 100; }, bonus: 0.01 },
-    { id: "a_1000",    icon: "\u{1F4AA}", name: "Finger-Athlet",        desc: "1.000 Klicks",                    test: function (s) { return s.clicks >= 1000; }, bonus: 0.02 },
-    { id: "a_10k",     icon: "\u{1F525}", name: "Karpaltunnel-Profi",   desc: "10.000 Klicks",                   test: function (s) { return s.clicks >= 10000; }, bonus: 0.05 },
-    { id: "a_total1",  icon: "\u{1F4B0}", name: "Taschengeld",          desc: "1.000 Blubber gesammelt",         test: function (s) { return s.total >= 1e3; }, bonus: 0.01 },
-    { id: "a_total2",  icon: "\u{1F4B8}", name: "Kleiner Teich",        desc: "10.000 Blubber gesammelt",        test: function (s) { return s.total >= 1e4; }, bonus: 0.02 },
-    { id: "a_total3",  icon: "\u{1F4B5}", name: "Fisch-Tycoon",         desc: "1 Mio. Blubber gesammelt",        test: function (s) { return s.total >= 1e6; }, bonus: 0.03 },
-    { id: "a_total4",  icon: "\u{1F3E6}", name: "Blubber-Magnat",       desc: "1 Mrd. Blubber gesammelt",        test: function (s) { return s.total >= 1e9; }, bonus: 0.07 },
-    { id: "a_b10",     icon: "\u{1F3D7}", name: "Baumeister",           desc: "50 Gebäude besitzen",            test: function (s) { return totalBuildings(s) >= 50; }, bonus: 0.02 },
-    { id: "a_b100",    icon: "\u{1F3D9}", name: "Teich-Konzern",        desc: "150 Gebäude besitzen",           test: function (s) { return totalBuildings(s) >= 150; }, bonus: 0.04 },
-    { id: "a_cps1",    icon: "\u{26A1}",  name: "Läuft von selbst",    desc: "10 Blubber/s",                    test: function (s) { return s.cps >= 10; },   bonus: 0.01 },
-    { id: "a_cps2",    icon: "\u{1F50C}", name: "Dauerbetrieb",         desc: "1.000 Blubber/s",                 test: function (s) { return s.cps >= 1000; }, bonus: 0.03 },
-    { id: "a_evo",     icon: "\u{1F409}", name: "Evolution",            desc: "Magikarp zu Gyarados",            test: function (s) { return !!s.evolved; },   bonus: 0.05 },
-    { id: "a_gold",    icon: "\u{1F31F}", name: "Glückstropfen",       desc: "Ein Blubber-Ball gefangen",       test: function (s) { return s.stats.golden >= 1; }, bonus: 0.02 },
-    { id: "a_gold5",   icon: "\u{2728}",  name: "Goldrausch",           desc: "5 Blubber-Bälle gefangen",       test: function (s) { return s.stats.golden >= 5; }, bonus: 0.03 },
-    { id: "a_gold25",  icon: "\u{1F7E1}", name: "Ball-Jäger",          desc: "25 Blubber-Bälle gefangen",      test: function (s) { return s.stats.golden >= 25; }, bonus: 0.05 },
-    { id: "a_season",  icon: "\u{1F327}", name: "Wetterfest",           desc: "5 Jahreszeiten erlebt",           test: function (s) { return s.stats.seasons >= 5; }, bonus: 0.02 },
-    { id: "a_ascend",  icon: "\u{1F300}", name: "Reinkarnation",        desc: "1-mal aufgestiegen",              test: function (s) { return s.ascensions >= 1; }, bonus: 0.02 },
-    { id: "a_ascend5", icon: "\u{1F52E}", name: "Kreislauf des Teichs", desc: "5-mal aufgestiegen",              test: function (s) { return s.ascensions >= 5; }, bonus: 0.05 },
-    { id: "a_upg",     icon: "\u{1F381}", name: "Sammler",              desc: "10 Upgrades gekauft",             test: function (s) { return s.stats.upgradesBought >= 10; }, bonus: 0.02 }
+    { id: "a_first",   icon: "\u{1F41F}", name: "Erster Blubber", desc: "Klicke 1-mal", bonus: 0,
+      test: function (s) { return s.clicks >= 1; }, metric: function (s) { return s.clicks; }, goal: 1 },
+    { id: "a_100",     icon: "\u{1F44B}", name: "Klick-Fisch", desc: "100 Klicks", bonus: 0.01,
+      test: function (s) { return s.clicks >= 100; }, metric: function (s) { return s.clicks; }, goal: 100 },
+    { id: "a_1000",    icon: "\u{1F4AA}", name: "Finger-Athlet", desc: "1.000 Klicks", bonus: 0.02,
+      test: function (s) { return s.clicks >= 1000; }, metric: function (s) { return s.clicks; }, goal: 1000 },
+    { id: "a_10k",     icon: "\u{1F525}", name: "Karpaltunnel-Profi", desc: "10.000 Klicks", bonus: 0.05,
+      test: function (s) { return s.clicks >= 10000; }, metric: function (s) { return s.clicks; }, goal: 10000 },
+    { id: "a_total1",  icon: "\u{1F4B0}", name: "Taschengeld", desc: "1.000 Blubber gesammelt", bonus: 0.01,
+      test: function (s) { return s.total >= 1e3; }, metric: function (s) { return s.total; }, goal: 1e3 },
+    { id: "a_total2",  icon: "\u{1F4B8}", name: "Kleiner Teich", desc: "10.000 Blubber gesammelt", bonus: 0.02,
+      test: function (s) { return s.total >= 1e4; }, metric: function (s) { return s.total; }, goal: 1e4 },
+    { id: "a_total3",  icon: "\u{1F4B5}", name: "Fisch-Tycoon", desc: "1 Mio. Blubber gesammelt", bonus: 0.03,
+      test: function (s) { return s.total >= 1e6; }, metric: function (s) { return s.total; }, goal: 1e6 },
+    { id: "a_total4",  icon: "\u{1F3E6}", name: "Blubber-Magnat", desc: "1 Mrd. Blubber gesammelt", bonus: 0.07,
+      test: function (s) { return s.total >= 1e9; }, metric: function (s) { return s.total; }, goal: 1e9 },
+    { id: "a_b10",     icon: "\u{1F3D7}", name: "Baumeister", desc: "50 Gebaeude besitzen", bonus: 0.02,
+      test: function (s) { return totalBuildings(s) >= 50; }, metric: totalBuildings, goal: 50 },
+    { id: "a_b100",    icon: "\u{1F3D9}", name: "Teich-Konzern", desc: "150 Gebaeude besitzen", bonus: 0.04,
+      test: function (s) { return totalBuildings(s) >= 150; }, metric: totalBuildings, goal: 150 },
+    { id: "a_cps1",    icon: "\u{26A1}",  name: "Laeuft von selbst", desc: "10 Blubber/s", bonus: 0.01,
+      test: function (s) { return s.cps >= 10; }, metric: function (s) { return s.cps || 0; }, goal: 10 },
+    { id: "a_cps2",    icon: "\u{1F50C}", name: "Dauerbetrieb", desc: "1.000 Blubber/s", bonus: 0.03,
+      test: function (s) { return s.cps >= 1000; }, metric: function (s) { return s.cps || 0; }, goal: 1000 },
+    { id: "a_evo",     icon: "\u{1F409}", name: "Evolution", desc: "Magikarp zu Gyarados", bonus: 0.05,
+      test: function (s) { return !!s.evolved; } },
+    { id: "a_gold",    icon: "\u{1F31F}", name: "Glueckstropfen", desc: "Ein Blubber-Ball gefangen", bonus: 0.02,
+      test: function (s) { return s.stats.golden >= 1; }, metric: function (s) { return s.stats.golden; }, goal: 1 },
+    { id: "a_gold5",   icon: "\u{2728}",  name: "Goldrausch", desc: "5 Blubber-Baelle gefangen", bonus: 0.03,
+      test: function (s) { return s.stats.golden >= 5; }, metric: function (s) { return s.stats.golden; }, goal: 5 },
+    { id: "a_gold25",  icon: "\u{1F7E1}", name: "Ball-Jaeger", desc: "25 Blubber-Baelle gefangen", bonus: 0.05,
+      test: function (s) { return s.stats.golden >= 25; }, metric: function (s) { return s.stats.golden; }, goal: 25 },
+    { id: "a_season",  icon: "\u{1F327}", name: "Wetterfest", desc: "5 Jahreszeiten erlebt", bonus: 0.02,
+      test: function (s) { return s.stats.seasons >= 5; }, metric: function (s) { return s.stats.seasons; }, goal: 5 },
+    { id: "a_ascend",  icon: "\u{1F300}", name: "Reinkarnation", desc: "1-mal aufgestiegen", bonus: 0.02,
+      test: function (s) { return s.ascensions >= 1; }, metric: function (s) { return s.ascensions; }, goal: 1 },
+    { id: "a_ascend5", icon: "\u{1F52E}", name: "Kreislauf des Teichs", desc: "5-mal aufgestiegen", bonus: 0.05,
+      test: function (s) { return s.ascensions >= 5; }, metric: function (s) { return s.ascensions; }, goal: 5 },
+    { id: "a_upg",     icon: "\u{1F381}", name: "Sammler", desc: "10 Upgrades gekauft", bonus: 0.02,
+      test: function (s) { return s.stats.upgradesBought >= 10; }, metric: function (s) { return s.stats.upgradesBought; }, goal: 10 },
+    { id: "a_sell",    icon: "\u{1F4B8}", name: "Fisch-Haendler", desc: "10 Gebaeude verkauft", bonus: 0.02,
+      test: function (s) { return s.stats.sold >= 10; }, metric: function (s) { return s.stats.sold || 0; }, goal: 10 },
+    { id: "a_ms10",    icon: "\u{1F3C6}", name: "Meilenstein-Jaeger", desc: "10 Meilensteine erreicht", bonus: 0.04,
+      test: function (s) { return totalMilestones(s) >= 10; }, metric: totalMilestones, goal: 10 },
+    { id: "a_mini",    icon: "\u{1F41B}", name: "Auch kleine Fische", desc: "Alle 10 Gebaeudearten besitzen", bonus: 0.03,
+      test: function (s) { return BUILDINGS.every(function (b) { return (s.buildings[b.id] || 0) > 0; }); },
+      metric: function (s) { return BUILDINGS.filter(function (b) { return (s.buildings[b.id] || 0) > 0; }).length; },
+      goal: 10 }
   ];
+
+  /** Summe aller erreichten Gebaeude-Meilensteine (fuer Erfolge). */
+  function totalMilestones(s) {
+    var n = 0;
+    Object.keys(s.buildings).forEach(function (id) {
+      var owned = s.buildings[id] || 0;
+      MILESTONES.forEach(function (m) { if (owned >= m) n++; });
+    });
+    return n;
+  }
 
   /* Jahreszeiten: alle 20 Minuten (nur aktive Spielzeit), je mit Effekt. */
   var SEASONS = [
@@ -156,11 +207,11 @@
       allTime: 0,       /* ueber alle Runden */
       clicks: 0,
       evolved: false,
-      buildings: { flosse: 0, algen: 0, teich: 0, rudel: 0, aquarium: 0, koralle: 0, tiefsee: 0, legende: 0 },
+      buildings: { flosse: 0, algen: 0, teich: 0, rudel: 0, aquarium: 0, koralle: 0, tiefsee: 0, legende: 0, ozean: 0, kosmos: 0 },
       upgrades: {},
       achievements: {},
       buffs: [],
-      stats: { golden: 0, seasons: 0, upgradesBought: 0 },
+      stats: { golden: 0, seasons: 0, upgradesBought: 0, sold: 0 },
       ascensions: 0,
       ascPoints: 0,     /* permanenter Bonus in Prozent */
       seasonIdx: 0,
@@ -205,11 +256,32 @@
 
   function hasUpgrade(id) { return !!state.upgrades[id]; }
 
+  var MILESTONES = [25, 50, 100, 150, 200];
+  var MILESTONE_BONUS = 0.01;      /* je Meilenstein +1 % auf DIESES Gebaeude */
+
+  /** Wie viele Meilensteine hat dieses Gebaeude bereits erreicht? */
+  function milestoneCount(bid) {
+    var owned = state.buildings[bid] || 0;
+    var n = 0;
+    MILESTONES.forEach(function (m) { if (owned >= m) n++; });
+    return n;
+  }
+
+  /** Naechster unerreichter Meilenstein oder null. */
+  function nextMilestone(bid) {
+    var owned = state.buildings[bid] || 0;
+    for (var i = 0; i < MILESTONES.length; i++) {
+      if (owned < MILESTONES[i]) return MILESTONES[i];
+    }
+    return null;
+  }
+
   function buildingMultiplier(bid) {
     var m = 1;
     BUILDING_UPGRADES.forEach(function (u) {
       if (u.target === bid && hasUpgrade(u.id)) m *= 2;
     });
+    m *= (1 + milestoneCount(bid) * MILESTONE_BONUS);
     return m;
   }
 
@@ -225,9 +297,23 @@
     return sum;
   }
 
+  /** Nur Buffs der Kategorie "cps" wirken auf die passive Produktion. */
   function buffMultiplier() {
     var m = 1;
-    state.buffs.forEach(function (b) { if (b.until > Date.now()) m *= b.mult; });
+    var now = Date.now();
+    state.buffs.forEach(function (b) {
+      if (b.until > now && b.kind === "cps") m *= b.mult;
+    });
+    return m;
+  }
+
+  /** Nur Buffs der Kategorie "click" wirken auf den Klickwert. */
+  function clickBuffMultiplier() {
+    var m = 1;
+    var now = Date.now();
+    state.buffs.forEach(function (b) {
+      if (b.until > now && b.kind === "click") m *= b.mult;
+    });
     return m;
   }
 
@@ -255,7 +341,8 @@
   /** Blubber pro Klick */
   function computePerClick() {
     var base = 1 + state.buildings.flosse * 1;          /* Flossen-Betrieb staerkt Klicks */
-    var m = clickMultiplier() * (1 + achievementBonus()) * prestigeMultiplier() * evolutionMultiplier();
+    var m = clickMultiplier() * (1 + achievementBonus()) * prestigeMultiplier() *
+            evolutionMultiplier() * clickBuffMultiplier();
     if (state.seasonActive && SEASONS[state.seasonIdx].id === "sommer") m *= 0.9;
     return base * m;
   }
@@ -372,11 +459,21 @@
     state.perClick = computePerClick();
 
     var bank = $("tyBank");
-    if (bank) bank.textContent = fmt(state.bank);
+    if (bank) bank.textContent = fmt(Math.max(0, state.bank));
     var cps = $("tyCps");
     if (cps) cps.textContent = fmt(state.cps) + "/s";
     var pc = $("tyPerClick");
     if (pc) pc.textContent = fmt(state.perClick);
+
+    /* Kritische Treffer: Chance kommt aus den Flossen, muss sichtbar sein */
+    var critEl = $("tyCrit");
+    if (critEl) {
+      var cc = critChance();
+      critEl.textContent = Math.round(cc * 100) + " %";
+      critEl.classList.toggle("off", cc <= 0);
+      var critRow = $("tyCritRow");
+      if (critRow) critRow.classList.toggle("off", cc <= 0);
+    }
 
     /* Evolutions-Fortschritt */
     var evoEl = $("tyEvoFill");
@@ -460,13 +557,26 @@
       right.appendChild(price);
       right.appendChild(cnt);
 
+      /* Verkaufen-Knopf: nur sichtbar, wenn man das Gebaeude besitzt */
+      var sell = document.createElement("button");
+      sell.type = "button";
+      sell.className = "ty-bld-sell";
+      sell.textContent = "\u{1F4B8}";
+      sell.title = "1 Stueck verkaufen (50 % zurueck)";
+      sell.setAttribute("aria-label", b.name + " verkaufen");
+      sell.addEventListener("click", function (e) {
+        e.stopPropagation();          /* nicht das Gebaeude kaufen */
+        sellBuilding(b.id, 1);
+      });
+
       row.appendChild(ic);
       row.appendChild(body);
       row.appendChild(right);
+      row.appendChild(sell);
       row.addEventListener("click", function () { buyBuilding(b.id, shopping === "max" ? "max" : Number(shopping)); });
       box.appendChild(row);
 
-      bldNodes[b.id] = { row: row, desc: ds, price: price, count: cnt, last: "" };
+      bldNodes[b.id] = { row: row, desc: ds, price: price, count: cnt, sell: sell, last: "" };
     });
   }
 
@@ -483,18 +593,29 @@
       var cost = bulkCost(b, owned, n);
       var afford = state.bank >= cost;
 
+      var nxtMs = nextMilestone(b.id);
+      var ms = milestoneCount(b.id);
       /* Nur schreiben, wenn sich etwas geaendert hat -> kein Flackern */
-      var sig = owned + "|" + cost + "|" + n;
+      var sig = owned + "|" + cost + "|" + n + "|" + ms;
       if (node.last !== sig) {
         node.last = sig;
-        node.desc.textContent = b.desc + " · je " + fmt(b.cps * buildingMultiplier(b.id)) + "/s" +
-          (n > 1 ? " · " + n + "x" : "");
+        var extra = "";
+        /* "3/5 Boni (+3 %)" ist selbsterklaerend; "Ziel 100" zeigt den naechsten Sprung. */
+        if (ms > 0) {
+          extra += " \u00B7 Boni " + ms + "/" + MILESTONES.length +
+                   " (+" + (ms * MILESTONE_BONUS * 100).toFixed(0) + " %)";
+        }
+        if (nxtMs !== null) extra += " \u00B7 n\u00E4chster Bonus bei " + nxtMs;
+        node.desc.textContent = b.desc + " \u00B7 je " + fmt(b.cps * buildingMultiplier(b.id)) + "/s" +
+          (n > 1 ? " \u00B7 " + n + "x" : "") + extra;
         node.price.textContent = fmt(cost);
         node.price.classList.toggle("tooMuch", !afford);
         node.count.textContent = owned > 0 ? String(owned) : "";
         node.count.classList.toggle("empty", owned === 0);
       }
       node.row.classList.toggle("locked", !afford);
+      node.row.classList.toggle("owned", owned > 0);
+      if (node.sell) node.sell.hidden = owned <= 0;
     });
   }
 
@@ -545,6 +666,15 @@
     });
   }
 
+  /** Fortschritt eines Erfolgs als "x/y" - null, wenn nicht messbar. */
+  function achProgress(a) {
+    if (!a.goal || !a.metric) return null;
+    var cur = 0;
+    try { cur = Number(a.metric(state)) || 0; } catch (e) { return null; }
+    cur = Math.min(cur, a.goal);
+    return { cur: cur, goal: a.goal };
+  }
+
   function renderAchievements() {
     var box = $("tyAchievements");
     if (!box) return;
@@ -553,44 +683,83 @@
     ACHIEVEMENTS.forEach(function (a) {
       var has = !!state.achievements[a.id];
       if (has) got++;
+      var prog = has ? null : achProgress(a);
+
       var el = document.createElement("div");
-      el.className = "ty-ach" + (has ? " got" : "");
+      el.className = "ty-ach" + (has ? " got" : "") + (prog ? " tracked" : "");
       el.title = a.name + " - " + a.desc + (a.bonus ? " (+" + Math.round(a.bonus * 100) + " % Produktion)" : "");
-      var i = document.createElement("span"); i.className = "ty-ach-icon"; i.textContent = has ? a.icon : "\u{1F512}";
-      var t = document.createElement("span"); t.className = "ty-ach-name"; t.textContent = a.name;
-      el.appendChild(i); el.appendChild(t);
+
+      var i = document.createElement("span");
+      i.className = "ty-ach-icon";
+      i.textContent = has ? a.icon : "\u{1F512}";
+
+      var t = document.createElement("span");
+      t.className = "ty-ach-name";
+      t.textContent = a.name;
+
+      el.appendChild(i);
+      el.appendChild(t);
+
+      if (prog) {
+        var p = document.createElement("span");
+        p.className = "ty-ach-prog";
+        p.textContent = fmt(prog.cur) + " / " + fmt(prog.goal);
+        el.appendChild(p);
+      }
       box.appendChild(el);
     });
     var cnt = $("tyAchCount");
     if (cnt) cnt.textContent = got + "/" + ACHIEVEMENTS.length;
   }
 
-  function renderStats() {
-    var box = $("tyStats");
-    if (!box) return;
-    var rows = [
-      ["Blubber im Konto", fmt(state.bank)],
+  var statNodes = null;   /* einmal gebaut, danach nur Werte tauschen */
+
+  function statRows() {
+    return [
+      ["Blubber im Konto", fmt(Math.max(0, state.bank))],
       ["Diese Runde gesammelt", fmt(state.total)],
       ["Insgesamt (alle Runden)", fmt(state.allTime)],
       ["Pro Sekunde", fmt(computeCps())],
       ["Pro Klick", fmt(computePerClick())],
       ["Klicks insgesamt", state.clicks.toLocaleString("de-DE")],
-      ["Gebäude insgesamt", totalBuildings(state).toLocaleString("de-DE")],
+      ["Geb\u00E4ude insgesamt", totalBuildings(state).toLocaleString("de-DE")],
       ["Upgrades gekauft", String(state.stats.upgradesBought)],
       ["Erfolge", Object.keys(state.achievements).length + " / " + ACHIEVEMENTS.length],
-      ["Blubber-Bälle gefangen", String(state.stats.golden)],
+      ["Blubber-B\u00E4lle gefangen", String(state.stats.golden)],
       ["Aufstiege", String(state.ascensions)],
       ["Prestige-Bonus", "+" + state.ascPoints + " %"],
-      ["Jahreszeiten erlebt", String(state.stats.seasons)]
+      ["Jahreszeiten erlebt", String(state.stats.seasons)],
+      ["Geb\u00E4ude verkauft", String(state.stats.sold || 0)],
+      ["Meilensteine", totalMilestones(state) + " / " + (BUILDINGS.length * MILESTONES.length)]
     ];
-    box.innerHTML = "";
-    rows.forEach(function (r) {
-      var d = document.createElement("div");
-      d.className = "ty-stat";
-      var k = document.createElement("span"); k.textContent = r[0];
-      var v = document.createElement("b"); v.textContent = r[1];
-      d.appendChild(k); d.appendChild(v);
-      box.appendChild(d);
+  }
+
+  function renderStats() {
+    var box = $("tyStats");
+    if (!box) return;
+
+    var rows = statRows();
+
+    if (!statNodes || statNodes.length !== rows.length) {
+      box.innerHTML = "";
+      statNodes = [];
+      rows.forEach(function (r) {
+        var d = document.createElement("div");
+        d.className = "ty-stat";
+        var k = document.createElement("span"); k.textContent = r[0];
+        var v = document.createElement("b");
+        d.appendChild(k); d.appendChild(v);
+        box.appendChild(d);
+        statNodes.push({ val: v, last: "" });
+      });
+    }
+
+    rows.forEach(function (r, i) {
+      var n = statNodes[i];
+      if (n.last !== r[1]) {
+        n.last = r[1];
+        n.val.textContent = r[1];
+      }
     });
   }
 
@@ -624,14 +793,7 @@
      ============================================================ */
   function clickFish(e) {
     var crit = Math.random() < critChance();
-    var base = computePerClick();
-    var mult = 1;
-
-    state.buffs.forEach(function (b) {
-      if (b.kind === "click" && b.until > Date.now()) mult *= b.mult;
-    });
-
-    var amount = base * mult * (crit ? 7 : 1);
+    var amount = computePerClick() * (crit ? 7 : 1);   /* Buffs stecken schon in computePerClick() */
     state.bank += amount;
     state.total += amount;
     state.allTime += amount;
@@ -681,17 +843,52 @@
     return true;
   }
 
+  var SELL_RATIO = 0.5;            /* Cookie Clicker gibt 50 % zurueck */
+
+  /** Verkauft n Stueck eines Gebaeudes (Rueckerstattung 50 %). */
+  function sellBuilding(id, n) {
+    var b = BUILDING_BY_ID[id];
+    if (!b) return false;
+    var owned = state.buildings[id];
+    if (owned <= 0) { flashMsg("Du besitzt kein " + b.name + "."); return false; }
+    var count = (n === "max" || n === undefined) ? owned : Math.min(owned, Number(n));
+    if (!count || count < 1) return false;
+
+    var refund = 0;
+    for (var i = 0; i < count; i++) {
+      /* das zuletzt gekaufte Stueck hat die hoechsten Kosten -> von hinten abrechnen */
+      refund += buildingCost(b, owned - 1 - i) * SELL_RATIO;
+    }
+    refund = Math.floor(refund);
+
+    state.buildings[id] = owned - count;
+    state.bank += refund;
+    state.stats.sold = (state.stats.sold || 0) + count;
+    flashMsg("\u{1F4B8} " + count + "x " + b.name + " verkauft · +" + fmt(refund) + " Blubber");
+    renderAll();
+    save();
+    return true;
+  }
+
   /* ---- Evolution: einmalig, bei EVOLVE_AT Gesamtblubber ---- */
   var EVOLVE_AT = 4e6;
+
+  /** Bild und Rahmen passend zum Evolutionszustand setzen (idempotent). */
+  function syncFishLook() {
+    var img = $("tyFishImg");
+    var skin = $("tyFish");
+    if (!img) return;
+    var target = state.evolved ? "assets/gyarados-avatar.jpg" : "assets/magikarp-avatar.jpg";
+    if (img.getAttribute("src") !== target) img.src = target;
+    img.alt = state.evolved ? "Gyarados" : "Magikarp";
+    if (skin) skin.classList.toggle("evolved", !!state.evolved);
+  }
 
   function applyEvolution() {
     if (state.evolved) return false;
     if (state.allTime < EVOLVE_AT) return false;
     state.evolved = true;
-    var img = $("tyFishImg");
-    if (img) { img.src = "assets/gyarados-avatar.jpg"; img.alt = "Gyarados"; }
-    var skin = $("tyFish");
-    if (skin) skin.classList.add("evolved");
+    syncFishLook();
     flashMsg("\u{1F409} EVOLUTION! Gyarados bringt ab jetzt +25 % auf alles.");
     toast("\u{1F409} EVOLUTION! Magikarp ist jetzt Gyarados!");
     if (window.confettiBurst) window.confettiBurst();
@@ -727,12 +924,9 @@
     state.buffs = [];
     state.seasonTime = 0;
     state.seasonActive = false;
-    var img = $("tyFishImg");
-    if (img) { img.src = "assets/magikarp-avatar.jpg"; img.alt = "Magikarp"; }
-    var skin = $("tyFish");
-    if (skin) skin.classList.remove("evolved");
-    /* Evolution bleibt freigeschaltet, weil allTime erhalten bleibt */
+    /* Evolution haengt an allTime, bleibt also erhalten. Bild danach ausrichten. */
     state.evolved = state.allTime >= EVOLVE_AT;
+    syncFishLook();
     renderAll();
     checkAchievements();
     save();
@@ -744,10 +938,7 @@
     if (!window.confirm("Alles löschen? Konto, Gebäude, Upgrades, Erfolge und Aufstiege verschwinden endgültig.")) return false;
     try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
     state = newState();
-    var img = $("tyFishImg");
-    if (img) { img.src = "assets/magikarp-avatar.jpg"; img.alt = "Magikarp"; }
-    var skin = $("tyFish");
-    if (skin) skin.classList.remove("evolved");
+    syncFishLook();
     renderAll();
     save();
     toast("\u{1F9F9} Teich geleert. Neuanfang!");
@@ -904,6 +1095,7 @@
       state.stats.golden = Math.floor(num(d.stats.golden));
       state.stats.seasons = Math.floor(num(d.stats.seasons));
       state.stats.upgradesBought = Math.floor(num(d.stats.upgradesBought));
+      state.stats.sold = Math.floor(num(d.stats.sold));
     }
 
     /* Offline-Produktion: max. 3 Stunden nachtragen.
@@ -1060,6 +1252,7 @@
     scheduleGolden();
     lastTick = Date.now();
     renderAll();
+    syncFishLook();
     applyEvolution();
     checkAchievements();
     setInterval(tick, TICK_MS);
@@ -1088,6 +1281,11 @@
     seasons: SEASONS,
     fmt: fmt,
     render: renderAll,
+    sellBuilding: sellBuilding,
+    milestoneCount: milestoneCount,
+    nextMilestone: nextMilestone,
+    totalMilestones: totalMilestones,
+    critChance: critChance,
     spawnGolden: spawnGolden,
     catchGolden: catchGolden,
     tick: tick,

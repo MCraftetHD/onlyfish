@@ -75,19 +75,24 @@ Kosten steigen pro Stück um **15 %** – exakt die Cookie-Clicker-Formel `Preis
 | 🐠 Fisch-Rudel | +47/s | 12.000 |
 | 🫗 Glas-Aquarium | +260/s | 130.000 |
 | 🪸 Korallen-Riff | +1,4K/s | 1,4 Mio. |
-| 🌊 Tiefsee-Anlage | +7,8K/s | 20 Mio. |
-| 🐉 Gyarados-Legende | +44K/s | 330 Mio. |
+| 🌊 Tiefsee-Anlage | +7,8K/s | 14 Mio. |
+| 🐉 Gyarados-Legende | +44K/s | 140 Mio. |
+| 🌍 Welt-Ozean | +260K/s | 1,4 Mrd. |
+| 🚀 Kosmos-Teich | +1,6Mio/s | 14 Mrd. |
 
-Kaufmenge lässt sich umschalten: **1 → 10 → 100 → MAX**. Der MAX-Kauf rechnet die geometrische Reihe aus, man zahlt also nie zu viel.
+Die Kostenleiter springt durchgehend um **×10 pro Stufe** und die Produktion um **×5,5–6** – dieselbe Kurve wie im Original, damit jede Stufe irgendwann sinnvoll wird.
 
-### Upgrades (38 Stück, einmalig)
+**Kaufmenge:** 1 → 10 → 100 → MAX. Der MAX-Kauf rechnet die geometrische Reihe aus, man zahlt also nie zu viel.
 
-- **6 Klick-Upgrades** – verdoppeln bzw. verdreifachen den Klickwert (100 bis 5 Mrd.)
-- **32 Gebäude-Upgrades** – je Gebäude vier Stufen, verfügbar ab 10/25/50/100 Stück, jeweils ×2 Produktion
+**Verkaufen:** Der 💰-Knopf an jeder Gebäudezeile verkauft 1 Stück für **50 %** des gezahlten Preises zurück (wie im Original). Kaufen und Verkaufen ist dadurch immer ein Verlust – kein Geldwäsche-Trick.
+
+### Meilensteine
+
+Ab **25, 50, 100, 150 und 200** Stück bekommt ein Gebäude dauerhaft **+1 %** auf seine eigene Produktion. Unter jedem Gebäude steht, wie viele Boni aktiv sind und wann der nächste kommt. Insgesamt sind 50 Meilensteine erreichbar (10 Gebäude × 5 Stufen).
 
 ### Weitere Systeme
 
-- **Erfolge:** 20 Stück, jeder gibt dauerhaft **+1 bis +7 % Produktion** (insgesamt +57 % möglich)
+- **Erfolge:** 23 Stück, jeder gibt dauerhaft **+1 bis +7 % Produktion** (insgesamt +64 % möglich). Jeder zeigt seinen Fortschritt live an (z. B. „1.847 / 10.000 Klicks").
 - **Blubber-Ball:** schwebt alle 90–180 s vorbei. Beim Klick: Sofort-Blubber (15 % des Kontos), *Klick-Frenzy* (15 s lang 77-fach), *Drachenrausch* (30 s lang 7-fach Produktion) oder – wie beim Original – nichts
 - **Jahreszeiten:** wechseln alle 2 Minuten Spielzeit, dazwischen 4 Minuten Ruhe. Sommer **+25 % Produktion**, Herbst −15 % dafür mehr Bälle, Winter stärkere Ball-Belohnungen
 - **Evolution:** ab **4 Mio.** gesammelten Blubber wird Magikarp zu Gyarados und gibt dauerhaft **+25 %**
@@ -100,12 +105,14 @@ Kaufmenge lässt sich umschalten: **1 → 10 → 100 → MAX**. Der MAX-Kauf rec
 
 ### Balance (gemessen, nicht geschätzt)
 
-| Meilenstein | Gelegenheitsspieler (1 Klick/s) | Normalspieler (4 Klicks/s) |
+| Meilenstein | Gelegenheitsspieler (2 Klick/s) | Normalspieler (5 Klick/s) |
 |---|---|---|
-| 1 Mio. Blubber | ~24 min | ~10 min |
-| 10 Mio. | ~61 min | ~36 min |
-| 100 Mio. | ~2,5 h | ~1,7 h |
-| Evolution (4 Mio.) | ~41 min | ~21 min |
+| 1 Mio. Blubber | ~11 min | ~6 min |
+| 10 Mio. | ~31 min | ~21 min |
+| 100 Mio. | ~78 min | ~61 min |
+| 1 Mrd. | ~3,2 h | ~2,8 h |
+| 10 Mrd. | ~7,4 h | ~6,9 h |
+| Welt-Ozean (1,4 Mrd.) | ~24 h | ~24 h |
 
 Das ist bewusst deutlich härter als vorher (Evolution lag bei 50 Blubber) und orientiert sich am Original.
 
