@@ -32,11 +32,10 @@ Der Bot antwortet mit dem Link zu dieser Seite.
 - FSK-18-Kiemen Age-Gate (Gag)
 - Abo-Tiers (Splasher / Kiemen-Fan / Gyarados VIP) – alle führen zurück zu Twitch
 - Gesperrte Beiträge, Likes, Teilen, Gratis-Geschenk
-- 🎮 **Füttere Magikarp:** 50 Klicks → Evolution zu Gyarados 🐉
 - 💬 Fake-DM mit Auto-Antworten („Blub.")
 - 📋 `!onlyfish` kopieren, Countdown zum nächsten Stream (22:30 Uhr)
 - 🔴 **Echter Live-Status** über decapi.me (live/offline, Spiel, Titel, Uptime) + optionaler Stream-Embed
-- 🎮 **Magikarp Tycoon:** Klicker mit 5 Upgrades, passivem Einkommen, kritischen Treffern, Evolutionsstufen und Prestige
+- 🎮 **Magikarp Tycoon:** vollwertiger Cookie-Clicker-Klon mit 8 Gebäuden, 38 Upgrades, Erfolgen, Jahreszeiten, Blubber-Bällen und Prestige
 - 🏆 **Blubber-Leaderboard:** Name eintragen (max. 15 Zeichen, gefiltert), Speicherung lokal im Browser
 - Blasen-Animation, Splash-Effekte, Konfetti
 
@@ -60,20 +59,55 @@ Kein API-Key, kein Secret, CORS-freundlich – läuft direkt auf GitHub Pages. I
 
 ## 🎮 Magikarp Tycoon
 
-Der Klicker in der Sidebar ist ein kleines Idle-Game:
+Ein Cookie-Clicker-Klon im Magikarp-Gewand. Die Logik liegt in **`assets/tycoon.js`** (rund 1.000 Zeilen, keine Abhängigkeiten), das Markup in `index.html`.
 
-| Upgrade | Wirkung | Startpreis |
+**Spielschleife:** klicken → Gebäude kaufen → Upgrades freischalten → Erfolge einsammeln → aufsteigen (Prestige).
+
+### Gebäude
+
+Kosten steigen pro Stück um **15 %** – exakt die Cookie-Clicker-Formel `Preis = Basis × 1,15^Stück`.
+
+| Gebäude | Produktion | Startpreis |
 |---|---|---|
-| 🖐️ Flossen-Power | +1 Blubber pro Klick | 15 |
-| 🌿 Algen-Farm | +1 Blubber pro Sekunde | 40 |
-| 🐠 Fisch-Rudel | +5 Blubber pro Sekunde | 400 |
-| 🫧 Aquarium | +25 Blubber pro Sekunde | 5.000 |
-| ⚡ Kritische Welle | +10 % Chance auf 10× Klick | 750 |
+| 🖐 Flossen-Betrieb | +0,1/s und +1 Klickwert | 15 |
+| 🌿 Algen-Farm | +1/s | 100 |
+| 💧 Schaum-Teich | +8/s | 1.100 |
+| 🐠 Fisch-Rudel | +47/s | 12.000 |
+| 🫗 Glas-Aquarium | +260/s | 130.000 |
+| 🪸 Korallen-Riff | +1,4K/s | 1,4 Mio. |
+| 🌊 Tiefsee-Anlage | +7,8K/s | 20 Mio. |
+| 🐉 Gyarados-Legende | +44K/s | 330 Mio. |
 
-- Preise steigen pro Level (Faktor ~1,9–2,4), jedes Upgrade hat ein Max-Level
-- **Evolution bei 50 Blubber** → Magikarp wird Gyarados, danach weitere Stufen bis Sturm-Gyarados (500)
-- Fortschritt wird in `localStorage` gespeichert und beim nächsten Besuch geladen
-- **Neu starten** (Prestige) ab 100 gesammelten Blubber – der Leaderboard-Eintrag bleibt
+Kaufmenge lässt sich umschalten: **1 → 10 → 100 → MAX**. Der MAX-Kauf rechnet die geometrische Reihe aus, man zahlt also nie zu viel.
+
+### Upgrades (38 Stück, einmalig)
+
+- **6 Klick-Upgrades** – verdoppeln bzw. verdreifachen den Klickwert (100 bis 5 Mrd.)
+- **32 Gebäude-Upgrades** – je Gebäude vier Stufen, verfügbar ab 10/25/50/100 Stück, jeweils ×2 Produktion
+
+### Weitere Systeme
+
+- **Erfolge:** 20 Stück, jeder gibt dauerhaft **+1 bis +7 % Produktion** (insgesamt +57 % möglich)
+- **Blubber-Ball:** schwebt alle 90–180 s vorbei. Beim Klick: Sofort-Blubber (15 % des Kontos), *Klick-Frenzy* (15 s lang 77-fach), *Drachenrausch* (30 s lang 7-fach Produktion) oder – wie beim Original – nichts
+- **Jahreszeiten:** wechseln alle 2 Minuten Spielzeit, dazwischen 4 Minuten Ruhe. Sommer **+25 % Produktion**, Herbst −15 % dafür mehr Bälle, Winter stärkere Ball-Belohnungen
+- **Evolution:** ab **4 Mio.** gesammelten Blubber wird Magikarp zu Gyarados und gibt dauerhaft **+25 %**
+- **Aufstieg (Prestige):** ab **10 Mio.** in einer Runde. Punkte wachsen mit `(Runde/10 Mio)^0,6`, jeder Punkt gibt +1 % permanent. Gebäude und Konto werden zurückgesetzt, Erfolge bleiben
+- **Offline-Produktion:** bis zu 3 Stunden bei 50 % Effizienz
+
+### Speicherung
+
+`localStorage` unter `onlyfish.tycoon.v3`. Ein vorhandenes Save aus der alten Version (`onlyfish.save.v2`) wird beim ersten Start automatisch übernommen. Alle geladenen Werte werden auf endliche, nicht-negative Zahlen geprüft – ein manipuliertes Save kann das Spiel nicht kaputt machen.
+
+### Balance (gemessen, nicht geschätzt)
+
+| Meilenstein | Gelegenheitsspieler (1 Klick/s) | Normalspieler (4 Klicks/s) |
+|---|---|---|
+| 1 Mio. Blubber | ~24 min | ~10 min |
+| 10 Mio. | ~61 min | ~36 min |
+| 100 Mio. | ~2,5 h | ~1,7 h |
+| Evolution (4 Mio.) | ~41 min | ~21 min |
+
+Das ist bewusst deutlich härter als vorher (Evolution lag bei 50 Blubber) und orientiert sich am Original.
 
 ## 🏆 Leaderboard
 
