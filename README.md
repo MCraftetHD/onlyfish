@@ -4,7 +4,7 @@ Die lustigste Parodie-Website für den Twitch-Streamer **dombledore1337** – 10
 
 ## 🚀 Live ansehen
 
-Die Seite ist eine einzige `index.html` (plus Bild in `assets/`). Einfach öffnen oder auf GitHub Pages hosten:
+Die Seite läuft ohne Build-Schritt: `index.html` (Startseite) und `spiel.html` (Clicker), dazu CSS/JS in `assets/`. Einfach öffnen oder auf GitHub Pages hosten:
 
 1. Repo auf GitHub pushen
 2. **Settings → Pages → Source: `main` / root**
@@ -59,7 +59,31 @@ Kein API-Key, kein Secret, CORS-freundlich – läuft direkt auf GitHub Pages. I
 
 ## 🎮 Magikarp Tycoon
 
-Ein Cookie-Clicker-Klon im Magikarp-Gewand. Die Logik liegt in **`assets/tycoon.js`** (rund 1.000 Zeilen, keine Abhängigkeiten), das Markup in `index.html`.
+Ein Cookie-Clicker-Klon im Magikarp-Gewand.
+
+**Das Spiel hat eine eigene Seite: [`spiel.html`](spiel.html)** – bewusst getrennt, damit das UI nicht in der Sidebar gequetscht wird und auf dem Handy spielbar bleibt.
+
+| Datei | Inhalt |
+|---|---|
+| `spiel.html` | Die Spielseite (Layout, Shop, Leaderboard) |
+| `assets/tycoon.js` | Komplette Spiellogik, keine Abhängigkeiten |
+| `assets/spiel.js` | Nur Seiten-Glue: Toast, Modal, Hilfe-Text, Leaderboard |
+| `assets/spiel.css` | Layout + Mobile-Regeln der Spielseite |
+| `assets/style.css` | Gemeinsames Design beider Seiten |
+
+Auf der Startseite bleibt eine **Teaser-Karte** mit den live gelesenen Zahlen (Blubber, CPS, Erfolge). Sie rechnet die Werte aus dem `localStorage` nach – inklusive Meilensteinen, Upgrades, Erfolgen, Prestige und Evolution –, ohne das ganze Spiel zu laden.
+
+### Mobile
+
+Die Spielseite ist auf Touch ausgelegt:
+
+- Ab 820 px wird aus dem 2-Spalten-Layout eine Spalte. Der **Klickbereich klebt oben** (`position: sticky`), damit man beim Einkaufen weiterklicken kann.
+- Der Fisch bleibt mit **96 px** (84 px unter 400 px Breite) groß genug als Trefferfläche.
+- Der 💰-Verkaufen-Knopf ist auf Touch **immer sichtbar** (kein Hover nötig) und misst 34 px.
+- `env(safe-area-inset-bottom)` hält Inhalte über der iOS-Leiste frei; Toasts sitzen ebenfalls darüber.
+- Querformat bekommt ein eigenes Layout (Fisch links, Shop rechts).
+- `touch-action: manipulation` verhindert Doppeltipp-Zoom, `-webkit-tap-highlight-color` das blaue Aufblitzen.
+- `prefers-reduced-motion` schaltet die Ball-Animation ab.
 
 **Spielschleife:** klicken → Gebäude kaufen → Upgrades freischalten → Erfolge einsammeln → aufsteigen (Prestige).
 

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Magikarp Tycoon 🐟 – OnlyFish Clicker</title>
+<meta name="description" content="Magikarp Tycoon – der Cookie-Clicker-Klon im OnlyFish-Gewand. 10 Gebäude, Meilensteine, Erfolge und Prestige. Klick dich zum Gyarados." />
+<link rel="icon" type="image/png" href="assets/favicon.png" />
+<meta property="og:title" content="Magikarp Tycoon 🐟" />
+<meta property="og:description" content="Cookie-Clicker-Klon mit 10 Gebäuden, Meilensteinen und Prestige. Jetzt Blubber farmen." />
+<meta property="og:image" content="assets/magikarp-hero.jpg" />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#00aff0" />
+<link rel="stylesheet" href="assets/style.css" />
+<link rel="stylesheet" href="assets/spiel.css" />
+</head>
+<body class="game-page">
+
+<header>
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><span class="fish">🐟</span> Only<span>Fish</span></a>
+    <nav class="nav-links">
+      <a href="index.html#profil">Profil</a>
+      <a href="index.html#beitraege">Beiträge</a>
+      <a href="spiel.html" class="active">Spiel</a>
+      <a href="index.html#befehl">Chat-Befehl</a>
+      <button class="btn btn-primary btn-sm" onclick="location.href='index.html#abo'">Abtauchen 💦</button>
+    </nav>
+  </div>
+</header>
+
+<main class="game-shell">
+  <div class="game-titlebar">
+    <div>
+      <h1>🎮 Magikarp Tycoon</h1>
+      <p class="sub">Klicken, Gebäude kaufen, aufsteigen. Gyarados gibt's nach <strong>4 Mio.</strong> Blubber. 🐉</p>
+    </div>
+    <a class="btn btn-ghost btn-sm back-link" href="index.html">← Zurück zur Seite</a>
+  </div>
+
+  <div class="ty-game" id="tyGame">
+      <!-- LINKS: Klickbereich -->
+      <div class="ty-left">
+        <div class="ty-fishwrap" id="tyFishWrap">
+          <div class="ty-fish" id="tyFish" role="button" tabindex="0" aria-label="Magikarp fuettern">
+            <img id="tyFishImg" src="assets/magikarp-avatar.jpg" alt="Magikarp" />
+          </div>
+        </div>
+
+        <div class="ty-badges">
+          <span class="ty-season" id="tySeason">🌤 ruhiges Wetter</span>
+        </div>
+
+        <div class="ty-buffs empty" id="tyBuffs"></div>
+
+        <div class="ty-res">
+          <div class="ty-res-main">
+            <span>Blubber</span>
+            <strong id="tyBank">0</strong>
+          </div>
+          <div class="ty-res-side">
+            <div><span>pro Sekunde</span><b id="tyCps">0/s</b></div>
+            <div><span>pro Klick</span><b id="tyPerClick">1</b></div>
+          </div>
+          <div class="ty-res-crit off" id="tyCritRow">
+            <span>⚡ Kritische Welle</span><b id="tyCrit">0 %</b>
+          </div>
+        </div>
+
+        <div class="ty-evo">
+          <div class="ty-evo-bar"><div id="tyEvoFill"></div></div>
+          <span id="tyEvoLabel">Evolution bei 4 Mio. Blubber · 0 %</span>
+        </div>
+
+        <p class="ty-msg" id="tyMsg"></p>
+
+        <div class="ty-actions">
+          <button class="btn btn-ghost btn-sm" type="button" id="tyHelpBtn">❓ So geht's</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="tyResetBtn">🧹 Alles löschen</button>
+        </div>
+      </div>
+
+      <!-- RECHTS: Shop -->
+      <div class="ty-right">
+        <div class="ty-tabs" role="tablist">
+          <button class="ty-tab active" data-tab="buildings" type="button" role="tab">🏗 Gebäude</button>
+          <button class="ty-tab" data-tab="upgrades" type="button" role="tab">⬆️ Upgrades <span id="tyUpgCount">–</span></button>
+          <button class="ty-tab" data-tab="achievements" type="button" role="tab">🏆 Erfolge <span id="tyAchCount">0/20</span></button>
+          <button class="ty-tab" data-tab="stats" type="button" role="tab">📊 Statistik</button>
+        </div>
+
+        <div class="ty-pane" id="tyPane-buildings">
+          <div class="ty-pane-head">
+            <strong>Gebäude</strong>
+            <button class="ty-shopbtn" type="button" id="tyShopBtn">Kaufen: 1</button>
+          </div>
+          <div class="ty-list" id="tyBuildings"></div>
+        </div>
+
+        <div class="ty-pane hidden" id="tyPane-upgrades">
+          <div class="ty-pane-head">
+            <strong>Upgrades</strong>
+            <span>einmalig, dauerhaft</span>
+          </div>
+          <div class="ty-list" id="tyUpgrades"></div>
+        </div>
+
+        <div class="ty-pane hidden" id="tyPane-achievements">
+          <div class="ty-pane-head">
+            <strong>Erfolge</strong>
+            <span>jeder Erfolg gibt Produktionsbonus</span>
+          </div>
+          <div class="ty-achs" id="tyAchievements"></div>
+        </div>
+
+        <div class="ty-pane hidden" id="tyPane-stats">
+          <div class="ty-pane-head"><strong>Statistik</strong></div>
+          <div class="ty-stats" id="tyStats"></div>
+          <div class="ty-ascend">
+            <p id="tyAscendInfo">Prestige: steige auf für einen permanenten Bonus.</p>
+            <button class="btn btn-primary btn-sm" type="button" id="tyAscendBtn">🌀 Aufsteigen</button>
+            <span class="ty-asc-bonus">aktueller Bonus: <b id="tyAscBonus">+0 %</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lb-box">
+    <div class="lb-title"><strong>🏆 Blubber-Leaderboard</strong><span id="lbCount">leer</span></div>
+    <form class="lb-form" id="lbForm" autocomplete="off" onsubmit="submitScore(event)">
+      <input class="lb-input" id="lbName" type="text" maxlength="15" placeholder="Dein Name (max. 15)"
+             autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Name für das Leaderboard" />
+      <button class="lb-submit" type="submit" id="lbSubmit">Eintragen</button>
+    </form>
+    <p class="lb-hint" id="lbHint">Max. 15 Zeichen · nur Buchstaben, Zahlen, _ und - · keine Schimpfwörter</p>
+    <ol class="lb-list" id="lbList"></ol>
+    <div class="lb-foot">
+      <span>wird nur auf deinem Gerät gespeichert</span>
+      <button class="lb-clear" type="button" onclick="clearLeaderboard()">Liste löschen</button>
+    </div>
+  </div>
+
+  <p class="game-foot">
+    Fortschritt liegt lokal in deinem Browser. <a href="index.html">Zurück zu OnlyFish</a> · <a href="https://www.twitch.tv/dombledore1337" target="_blank" rel="noopener">Zum Twitch-Stream</a>
+  </p>
+</main>
+
+<div id="toast"></div>
+<div id="tyToast" role="status" aria-live="polite"></div>
+
+<!-- Modal (wird fuer die Spiel-Hilfe gebraucht) -->
+<div id="modalBackdrop" class="modal-backdrop" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-emoji" id="modalEmoji">🎣</div>
+    <h2 id="modalTitle">Hinweis</h2>
+    <p id="modalText"></p>
+    <div class="modal-actions">
+      <a href="https://www.twitch.tv/dombledore1337" target="_blank" rel="noopener" class="btn btn-twitch" id="twitchLink">🟣 Zum Twitch-Stream</a>
+      <button class="btn-close" onclick="closeModal()">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/spiel.js"></script>
+<script src="assets/tycoon.js"></script>
+</body>
+</html>
