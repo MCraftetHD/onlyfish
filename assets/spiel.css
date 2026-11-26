@@ -1,0 +1,285 @@
+/* ==========================================================
+   Magikarp Tycoon - eigene Spielseite
+   Wird NACH assets/style.css geladen und ueberschreibt nur,
+   was auf der Unterseite anders ist. Die .ty-* Klassen aus
+   style.css bleiben unveraendert nutzbar.
+   ========================================================== */
+
+body.game-page{
+  /* Platz fuer die iOS-Safe-Area, sonst liegt der Shop unter dem Home-Indicator */
+  padding-bottom:env(safe-area-inset-bottom, 0);
+}
+
+/* ---------- Grundgeruest ---------- */
+.game-shell{
+  max-width:1240px;
+  margin:0 auto;
+  padding:22px 20px 60px;
+}
+
+.game-titlebar{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.game-titlebar h1{font-size:1.6rem;font-weight:900;letter-spacing:-.4px;line-height:1.2}
+.game-titlebar .sub{font-size:.88rem;color:var(--muted);margin-top:3px}
+.back-link{flex-shrink:0}
+
+/* ---------- Layout: links klicken, rechts Shop ---------- */
+/* Auf der Unterseite hat das Spiel Platz - 2 Spalten mit fester
+   linker Spalte, damit der Fisch beim Scrollen im Shop stehen bleibt. */
+.game-shell .ty-game{
+  display:grid;
+  grid-template-columns:minmax(300px,340px) minmax(0,1fr);
+  gap:22px;
+  align-items:start;
+}
+
+.game-shell .ty-left{
+  position:sticky;
+  top:74px;                       /* unter dem sticky Header */
+  background:linear-gradient(180deg,#f0fbff,#eaf7fd);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  text-align:center;
+}
+
+.game-shell .ty-fishwrap{min-height:170px}
+.game-shell .ty-fish img{width:150px;height:150px}
+
+.game-shell .ty-res-main strong{font-size:1.75rem}
+
+.game-shell .ty-right{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+}
+
+/* Liste darf auf grossen Screens hoeher werden */
+.game-shell .ty-list{max-height:520px}
+.game-shell .ty-achs{max-height:520px}
+.game-shell .ty-stats{max-height:420px}
+
+/* Leaderboard unter dem Spiel */
+.game-shell .lb-box{
+  margin-top:22px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+}
+.game-shell .lb-list{max-height:280px}
+
+.game-foot{
+  margin-top:22px;
+  text-align:center;
+  font-size:.74rem;
+  color:var(--muted);
+}
+.game-foot a{color:var(--primary-dark);font-weight:700;text-decoration:none}
+.game-foot a:hover{text-decoration:underline}
+
+/* Modal braucht auf der Unterseite keine Age-Gate-Optik */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(2,20,40,.72);
+  display:none;align-items:center;justify-content:center;
+  padding:20px;z-index:300;backdrop-filter:blur(4px);
+}
+.modal-backdrop.open{display:flex}
+.modal{
+  background:#fff;border-radius:20px;padding:26px;
+  max-width:420px;width:100%;text-align:center;
+  box-shadow:0 24px 60px rgba(2,44,74,.35);
+  max-height:86vh;overflow-y:auto;
+  animation:modalIn .22s ease-out;
+}
+@keyframes modalIn{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-emoji{font-size:3rem;line-height:1;margin-bottom:10px}
+.modal h2{font-size:1.25rem;font-weight:900;margin-bottom:10px}
+.modal p{font-size:.88rem;color:var(--muted);line-height:1.6;margin-bottom:18px;text-align:left}
+.modal p strong{color:var(--text)}
+.modal-actions{display:flex;flex-direction:column;gap:8px}
+.btn-close{background:none;border:none;color:var(--muted);font-size:.82rem;font-weight:700;cursor:pointer;padding:8px}
+.btn-close:hover{color:var(--text)}
+
+/* ==========================================================
+   TABLET
+   ========================================================== */
+@media(max-width:1000px){
+  .game-shell .ty-game{
+    grid-template-columns:minmax(260px,300px) minmax(0,1fr);
+    gap:16px;
+  }
+  .game-shell .ty-fish img{width:132px;height:132px}
+  .game-shell .ty-list{max-height:440px}
+}
+
+/* ==========================================================
+   MOBILE - das ist der wichtige Teil
+   Auf schmalen Screens wird aus dem 2-Spalten-Layout eine
+   Spalte: oben Konto + Fisch (kompakt, klebt oben), darunter
+   der Shop. Der Fisch bleibt gross genug zum Klicken (>=96px
+   Trefferflaeche, Apple/Google empfehlen 44px Minimum).
+   ========================================================== */
+@media(max-width:820px){
+  .game-shell{padding:14px 12px 40px}
+
+  .game-titlebar{margin-bottom:12px;align-items:center}
+  .game-titlebar h1{font-size:1.2rem}
+  .game-titlebar .sub{font-size:.76rem}
+  .back-link{font-size:.74rem;padding:7px 12px}
+
+  .game-shell .ty-game{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  /* Klickbereich klebt oben fest, damit man beim Einkaufen
+     weiterklicken kann, ohne hochzuscrollen */
+  .game-shell .ty-left{
+    position:sticky;
+    top:56px;                     /* Hoehe des mobilen Headers */
+    z-index:40;
+    padding:10px 12px;
+    border-radius:14px;
+    box-shadow:0 6px 18px rgba(2,44,74,.1);
+  }
+
+  .game-shell .ty-fishwrap{min-height:104px}
+  .game-shell .ty-fish img{width:96px;height:96px;border-width:3px}
+
+  /* Konto + Werte nebeneinander statt untereinander */
+  .game-shell .ty-res{
+    display:grid;
+    grid-template-columns:1fr auto;
+    align-items:center;
+    gap:10px;
+    padding:8px 10px;
+    margin-top:2px;
+  }
+  .game-shell .ty-res-main strong{font-size:1.15rem}
+  .game-shell .ty-res-side{
+    display:flex;
+    gap:12px;
+    margin:0;
+    padding:0;
+    border-top:none;
+  }
+  .game-shell .ty-res-side div{align-items:flex-end;text-align:right}
+  .game-shell .ty-res-side span{font-size:.54rem}
+  .game-shell .ty-res-side b{font-size:.76rem}
+  .game-shell .ty-res-crit{margin-top:5px;padding-top:5px;font-size:.6rem}
+
+  /* Evolutionsleiste schlanker */
+  .game-shell .ty-evo{margin-top:6px}
+  .game-shell .ty-evo-bar{height:8px;margin-bottom:3px}
+  .game-shell .ty-evo span{font-size:.6rem}
+
+  .game-shell .ty-badges{margin:3px 0}
+  .game-shell .ty-season{font-size:.62rem;padding:2px 8px}
+  .game-shell .ty-buffs{min-height:18px;margin-bottom:2px}
+  .game-shell .ty-buff{font-size:.6rem;padding:2px 7px}
+
+  .game-shell .ty-msg{font-size:.68rem;margin-top:4px}
+  .game-shell .ty-actions{margin-top:6px}
+  .game-shell .ty-actions .btn{font-size:.68rem;padding:6px 4px}
+
+  /* Shop */
+  .game-shell .ty-right{padding:12px;border-radius:14px}
+  .game-shell .ty-tabs{gap:4px;margin-bottom:8px}
+  .game-shell .ty-tab{padding:5px 9px;font-size:.68rem}
+  .game-shell .ty-tab span{font-size:.6rem;padding:1px 5px}
+
+  .game-shell .ty-list,
+  .game-shell .ty-achs,
+  .game-shell .ty-stats{max-height:none;overflow:visible}
+
+  /* Gebaeude-Zeilen: groessere Touchflaechen, Verkaufen immer sichtbar
+     (auf Touch gibt es kein Hover) */
+  .game-shell .ty-bld{padding:11px 10px;margin-bottom:7px;gap:8px}
+  .game-shell .ty-bld-icon{font-size:1.25rem;width:26px}
+  .game-shell .ty-bld-body strong{font-size:.84rem}
+  .game-shell .ty-bld-body small{font-size:.66rem;line-height:1.35}
+  .game-shell .ty-bld-cost{font-size:.8rem}
+  .game-shell .ty-bld-sell{opacity:1;width:34px;height:34px;font-size:.95rem}
+
+  .game-shell .ty-upg{padding:11px 10px}
+  .game-shell .ty-ach{padding:9px 4px}
+  .game-shell .ty-ach-name{font-size:.58rem}
+  .game-shell .ty-ach-prog{font-size:.53rem}
+
+  .game-shell .lb-box{padding:12px;border-radius:14px;margin-top:12px}
+  .game-shell .lb-list{max-height:240px}
+
+  /* Unterer Rand: Platz, damit der letzte Eintrag nicht hinter
+     der iOS-Leiste verschwindet */
+  .game-foot{margin-top:14px;font-size:.68rem;padding-bottom:env(safe-area-inset-bottom, 0)}
+
+  /* Toast ueber der Safe-Area */
+  #tyToast{bottom:calc(16px + env(safe-area-inset-bottom, 0px));font-size:.76rem;padding:9px 16px}
+
+  /* Goldener Ball etwas groesser - auf Touch schwer zu treffen */
+  .ty-golden{width:64px;height:64px;line-height:64px;font-size:1.9rem}
+}
+
+/* ==========================================================
+   SEHR SCHMALE SCREENS (<400px)
+   ========================================================== */
+@media(max-width:400px){
+  .game-shell{padding:10px 8px 36px}
+  .game-shell .ty-fish img{width:84px;height:84px}
+  .game-shell .ty-fishwrap{min-height:92px}
+  .game-shell .ty-res-side{gap:8px}
+  .game-shell .ty-bld-desc{font-size:.62rem}
+  .game-shell .ty-tab{padding:5px 7px;font-size:.64rem}
+  .game-titlebar h1{font-size:1.05rem}
+}
+
+/* ==========================================================
+   QUERFORMAT auf dem Handy: Fisch links, Shop rechts
+   ========================================================== */
+@media(max-height:520px) and (orientation:landscape) and (max-width:920px){
+  .game-shell .ty-game{grid-template-columns:minmax(190px,220px) minmax(0,1fr);gap:10px}
+  .game-shell .ty-left{position:sticky;top:56px;padding:8px}
+  .game-shell .ty-fish img{width:76px;height:76px}
+  .game-shell .ty-fishwrap{min-height:80px}
+  .game-shell .ty-res-main strong{font-size:1rem}
+}
+
+/* ==========================================================
+   Barrierefreiheit / Praeferenzen
+   ========================================================== */
+@media(prefers-reduced-motion:reduce){
+  .ty-golden{animation:none}
+  .game-shell .ty-left{transition:none}
+}
+
+/* Tastaturfokus klar sichtbar (die Klickflaeche ist ein div) */
+.game-shell .ty-fish:focus-visible{
+  outline:3px solid var(--primary);
+  outline-offset:4px;
+  border-radius:50%;
+}
+
+/* Kein blaues Aufblitzen beim Antippen */
+.game-shell .ty-fish,
+.game-shell .ty-bld,
+.game-shell .ty-upg,
+.game-shell .ty-bld-sell{
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+
+/* Verhindert, dass beim schnellen Klicken der Text markiert wird */
+.game-shell .ty-fish,
+.game-shell .ty-bld,
+.game-shell .ty-upg{
+  user-select:none;
+  -webkit-user-select:none;
+}
