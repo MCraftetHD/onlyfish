@@ -81,7 +81,11 @@
         "Herbst −15 % Produktion dafür mehr Bälle, Winter stärkere Ball-Belohnungen.<br><br>" +
 
         "<strong>7. Erfolge</strong> geben dauerhaft Produktionsbonus, jeder zeigt seinen Fortschritt. " +
-        "<strong>Aufsteigen</strong> ab 10 Mio. setzt Gebäude und Konto zurück, gibt aber einen permanenten Prozent-Bonus, der bleibt – Erfolge bleiben auch.<br><br>" +
+        "<strong>Aufsteigen</strong> ab 10 Mio. setzt Gebäude und Konto zurück. Dafür bekommst du zwei Dinge:<br>" +
+        "· <strong>Prestige-Level</strong> – je <strong>+1 % Produktion</strong>, dauerhaft. Die Level werden nie ausgegeben.<br>" +
+        "· <strong>Mega-Kerne</strong> – die Währung für den <strong>Prestige-Baum</strong> im Reiter 🌀.<br><br>" +
+        "Im Baum kaufst du dauerhafte Verbesserungen. Das Ausgeben der Kerne senkt deinen Level-Bonus <em>nicht</em> – genau wie bei Cookie Clickers Heavenly Chips. " +
+        "Das große Ziel ist <strong>👑 MEGA GYARADOS</strong> (70 Kerne): ×3 auf alles, und dein Fisch verwandelt sich.<br><br>" +
 
         "<strong>8. Evolution:</strong> Ab 4 Mio. gesammelten Blubber wird Magikarp zu Gyarados und produziert dauerhaft +25 %.<br><br>" +
 
