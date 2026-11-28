@@ -164,7 +164,17 @@
     { id: "a_mini",    icon: "\u{1F41B}", name: "Auch kleine Fische", desc: "Alle 10 Gebaeudearten besitzen", bonus: 0.03,
       test: function (s) { return BUILDINGS.every(function (b) { return (s.buildings[b.id] || 0) > 0; }); },
       metric: function (s) { return BUILDINGS.filter(function (b) { return (s.buildings[b.id] || 0) > 0; }).length; },
-      goal: 10 }
+      goal: 10 },
+    /* --- Prestige --- */
+    { id: "a_core1",   icon: "\u{1F48E}", name: "Erster Kern", desc: "Ersten Mega-Kern verdient", bonus: 0.02,
+      test: function (s) { return s.cores >= 1 || s.ascensions >= 1; } },
+    { id: "a_core25",  icon: "\u{1F4A0}", name: "Kern-Schmiede", desc: "25 Mega-Kerne auf dem Konto", bonus: 0.03,
+      test: function (s) { return s.cores >= 25; },
+      metric: function (s) { return s.cores; }, goal: 25 },
+    { id: "a_gyara",   icon: "\u{1F409}", name: "Aufstieg der Legende", desc: "Gyarados-Erbe gekauft", bonus: 0.05,
+      test: function (s) { return !!s.pUpgrades.p_gyara; } },
+    { id: "a_mega",    icon: "\u{1F451}", name: "Mega!", desc: "Mega Gyarados freigeschaltet", bonus: 0.10,
+      test: function (s) { return !!s.pUpgrades.p_mega; } }
   ];
 
   /** Summe aller erreichten Gebaeude-Meilensteine (fuer Erfolge). */
@@ -196,7 +206,44 @@
      ============================================================ */
   var SAVE_KEY = "onlyfish.tycoon.v3";
   var LEGACY_KEYS = ["onlyfish.save.v2"];
-  var SAVE_VERSION = 3;
+  var SAVE_VERSION = 4;
+
+  /* ============================================================
+     PRESTIGE (wie Cookie Clickers Heavenly Chips)
+     - ascPoints = Prestige-LEVEL. Bleiben dauerhaft und geben
+       +1 % Produktion pro Level. Sie werden NIE ausgegeben.
+     - cores = Mega-Kerne. Die ausgabbare Waehrung, mit der man im
+       Prestige-Baum dauerhafte Verbesserungen kauft. Ausgeben senkt
+       den Level-Bonus NICHT (genau wie in Cookie Clicker).
+     - Beim Aufstieg bekommt man so viele Kerne wie Level dazu.
+     ============================================================ */
+  var CORE_START = 2;          /* Aufstieg ab 10 Mio. gibt direkt 2 Kerne */
+  var CORE_RATIO = 0.6;        /* Wachstum der Kerne pro Level */
+
+  /* ---------- Prestige-Baum (die "Heavenly Upgrades") ----------
+     mode:
+       "add"  -> bonus += value            (additiv, in Prozentpunkten)
+       "mult" -> mult *= value             (Faktor, z. B. 1.25)
+       "flag" -> setzt state.pFlags[id]    (Sonderverhalten im Code)
+     Jeder Knoten hat ein festes level. Nur gueltige Werte werden
+     geladen, damit fremde Saves keinen Unsinn einschleusen. */
+  var PRESTIGE_LIFE = 1;   /* "Guenstige Flossen": dauerhaft +50 % mehr Blubber pro Klick */
+
+  var PRESTIGE_UPGRADES = [
+    { id: "p_start",    tier: 1, icon: "\u{1F331}", name: "Samenkorn",          cost: 2,    mode: "add",  value: 20,    desc: "+20 % Produktion" },
+    { id: "p_click",    tier: 1, icon: "\u{1F590}", name: "Guenstige Flossen",   cost: 3,    mode: "flag", desc: "+50 % Blubber pro Klick" },
+    { id: "p_gold",     tier: 2, icon: "\u{1F7E1}", name: "Goldene Schuppen",    cost: 4,    mode: "add",  value: 25,    desc: "+25 % Produktion" },
+    { id: "p_evolve",   tier: 2, icon: "\u{1F409}", name: "Schnelle Evolution",  cost: 5,    mode: "flag", desc: "Evolution braucht nur 1 Mio. statt 4 Mio." },
+    { id: "p_cheap",    tier: 3, icon: "\u{1F3F7}", name: "Fisch-Mengenrabatt",  cost: 8,   mode: "flag", desc: "Gebaeude kosten nur 12 % mehr statt 15 %" },
+    { id: "p_sell",     tier: 3, icon: "\u{1F4B8}", name: "Treue Haendler",      cost: 10,   mode: "flag", desc: "Verkauf bringt 100 % statt 50 %" },
+    { id: "p_crit",     tier: 4, icon: "\u{26A1}",  name: "Blitz-Flossen",       cost: 14,   mode: "flag", desc: "Doppelte Krit-Chance" },
+    { id: "p_offline",  tier: 4, icon: "\u{1F319}", name: "Mondlicht",           cost: 18,   mode: "flag", desc: "Offline doppelt so effizient (100 %)" },
+    { id: "p_ms",       tier: 5, icon: "\u{2B50}",  name: "Meilenstein-Praemie", cost: 25,   mode: "flag", desc: "Meilensteine geben doppelt so viel" },
+    { id: "p_gyara",    tier: 5, icon: "\u{1F409}", name: "Gyarados-Erbe",       cost: 35,   mode: "add",  value: 50,    desc: "+50 % Produktion" },
+    { id: "p_mega",     tier: 6, icon: "\u{1F451}", name: "MEGA GYARADOS",       cost: 70,   mode: "mult", value: 3,     desc: "x3 auf ALLES - und der Fisch wird Mega" }
+  ];
+  var PRESTIGE_BY_ID = {};
+  PRESTIGE_UPGRADES.forEach(function (u) { PRESTIGE_BY_ID[u.id] = u; });
 
   var state = newState();
 
@@ -213,7 +260,10 @@
       buffs: [],
       stats: { golden: 0, seasons: 0, upgradesBought: 0, sold: 0 },
       ascensions: 0,
-      ascPoints: 0,     /* permanenter Bonus in Prozent */
+      ascPoints: 0,     /* Prestige-LEVEL: +1 % pro Level, wird nie ausgegeben */
+      cores: 0,         /* Mega-Kerne: ausgabbare Waehrung fuer den Baum */
+      pUpgrades: {},    /* gekaufte Prestige-Knoten */
+      pFlags: {},       /* abgeleitete Sonderfaehigkeiten */
       seasonIdx: 0,
       seasonTime: 0,
       seasonActive: false,
@@ -233,7 +283,7 @@
      3. ABGELEITETE WERTE
      ============================================================ */
   function buildingCost(b, owned) {
-    return Math.ceil(b.base * Math.pow(COST_RATE, owned || 0));
+    return Math.ceil(b.base * Math.pow(costRate(), owned || 0));
   }
 
   /** Summe fuer n weitere Stuecke (geometrische Reihe). */
@@ -281,7 +331,8 @@
     BUILDING_UPGRADES.forEach(function (u) {
       if (u.target === bid && hasUpgrade(u.id)) m *= 2;
     });
-    m *= (1 + milestoneCount(bid) * MILESTONE_BONUS);
+    var msBonus = MILESTONE_BONUS * (hasPrestigeFlag("p_ms") ? 2 : 1);
+    m *= (1 + milestoneCount(bid) * msBonus);
     return m;
   }
 
@@ -322,7 +373,31 @@
     return SEASONS[state.seasonIdx].cpsMult;
   }
 
+  /* Level-Bonus: +1 % pro Prestige-Level, unabhaengig von gekauften Knoten. */
   function prestigeMultiplier() { return 1 + state.ascPoints / 100; }
+
+  /** Additiver Bonus aus allen "add"-Knoten, als Faktor. */
+  function prestigeBonusMultiplier() {
+    var add = 0;
+    PRESTIGE_UPGRADES.forEach(function (u) {
+      if (u.mode === "add" && state.pUpgrades[u.id]) add += u.value;
+    });
+    return 1 + add / 100;
+  }
+
+  /** Faktor aus allen "mult"-Knoten. */
+  function prestigeFlatMultiplier() {
+    var m = 1;
+    PRESTIGE_UPGRADES.forEach(function (u) {
+      if (u.mode === "mult" && state.pUpgrades[u.id]) m *= u.value;
+    });
+    return m;
+  }
+
+  function hasPrestigeFlag(id) { return !!state.pFlags[id]; }
+
+  /* Der Gebaeude-Preis steigt pro Stueck; "Mengenrabatt" senkt die Rate. */
+  function costRate() { return hasPrestigeFlag("p_cheap") ? 1.12 : 1.15; }
 
   /* Evolution gibt einen dauerhaften Bonus von +25 %, nicht nur Optik. */
   function evolutionMultiplier() { return state.evolved ? 1.25 : 1; }
@@ -334,7 +409,8 @@
       base += b.cps * state.buildings[b.id] * buildingMultiplier(b.id);
     });
     var m = (1 + achievementBonus()) * buffMultiplier() * seasonMultiplier() *
-            prestigeMultiplier() * evolutionMultiplier();
+            prestigeMultiplier() * evolutionMultiplier() *
+            prestigeBonusMultiplier() * prestigeFlatMultiplier();
     return base * m;
   }
 
@@ -342,14 +418,17 @@
   function computePerClick() {
     var base = 1 + state.buildings.flosse * 1;          /* Flossen-Betrieb staerkt Klicks */
     var m = clickMultiplier() * (1 + achievementBonus()) * prestigeMultiplier() *
-            evolutionMultiplier() * clickBuffMultiplier();
+            evolutionMultiplier() * clickBuffMultiplier() *
+            prestigeBonusMultiplier() * prestigeFlatMultiplier();
+    if (hasPrestigeFlag("p_click")) m *= 1.5;
     if (state.seasonActive && SEASONS[state.seasonIdx].id === "sommer") m *= 0.9;
     return base * m;
   }
 
   function critChance() {
     /* Krit-Chance waechst mit Flossen-Stueckzahl, max 35 % */
-    return Math.min(0.35, state.buildings.flosse * 0.002);
+    var c = state.buildings.flosse * 0.002 * (hasPrestigeFlag("p_crit") ? 2 : 1);
+    return Math.min(0.70, c);
   }
 
   /* ============================================================
@@ -477,13 +556,13 @@
 
     /* Evolutions-Fortschritt */
     var evoEl = $("tyEvoFill");
-    var evoPct = Math.min(100, state.allTime / EVOLVE_AT * 100);
+    var evoPct = Math.min(100, state.allTime / evolveAt() * 100);
     if (evoEl) evoEl.style.width = evoPct + "%";
     var evoLbl = $("tyEvoLabel");
     if (evoLbl) {
       evoLbl.textContent = state.evolved
         ? "\u{1F409} Gyarados (entwickelt)"
-        : "Evolution bei " + fmt(EVOLVE_AT) + " Blubber · " + Math.floor(evoPct) + " %";
+        : "Evolution bei " + fmt(evolveAt()) + " Blubber · " + Math.floor(evoPct) + " %";
     }
 
     /* Jahreszeit / Wetter */
@@ -727,7 +806,10 @@
       ["Erfolge", Object.keys(state.achievements).length + " / " + ACHIEVEMENTS.length],
       ["Blubber-B\u00E4lle gefangen", String(state.stats.golden)],
       ["Aufstiege", String(state.ascensions)],
+      ["Prestige-Level", String(state.ascPoints)],
       ["Prestige-Bonus", "+" + state.ascPoints + " %"],
+      ["Mega-Kerne", fmt(state.cores)],
+      ["Prestige-Baum", Object.keys(state.pUpgrades).length + " / " + PRESTIGE_UPGRADES.length],
       ["Jahreszeiten erlebt", String(state.stats.seasons)],
       ["Geb\u00E4ude verkauft", String(state.stats.sold || 0)],
       ["Meilensteine", totalMilestones(state) + " / " + (BUILDINGS.length * MILESTONES.length)]
@@ -767,14 +849,129 @@
     var btn = $("tyAscendBtn");
     var info = $("tyAscendInfo");
     var pts = ascendPointsFor(state.total);
+    var cores = coresForLevels(pts);
     if (btn) {
       btn.disabled = pts < 1;
-      btn.textContent = "\u{1F300} Aufsteigen (+" + pts + ")";
+      btn.textContent = "\u{1F300} Aufsteigen (+" + pts + " Level, +" + cores + " Kerne)";
     }
     if (info) {
       info.textContent = pts < 1
         ? "Ab " + fmt(ASCEND_MIN) + " Blubber in dieser Runde kannst du aufsteigen. Du hast " + fmt(state.total) + "."
-        : "Aufstieg bringt +" + pts + " % permanenten Produktionsbonus. Gebäude und Konto werden zurückgesetzt, Erfolge bleiben.";
+        : "Bringt +" + pts + " Prestige-Level (+" + pts + " % dauerhaft) und " + cores +
+          " Mega-Kerne für den Prestige-Baum. Gebäude und Konto werden zurückgesetzt.";
+    }
+    /* Level, Kerne und Abzeichen im Prestige-Tab */
+    var lvlEl = $("tyPrestLvl");
+    if (lvlEl) lvlEl.textContent = state.ascPoints;
+    var coreEl = $("tyCores");
+    if (coreEl) coreEl.textContent = state.cores;
+    /* Abzeichen am Tab: wie viele Baum-Knoten man sich gerade leisten kann */
+    var badge = $("tyPrestBadge");
+    if (badge) {
+      var kaufbar = 0;
+      PRESTIGE_UPGRADES.forEach(function (u) {
+        if (!state.pUpgrades[u.id] && state.cores >= u.cost) kaufbar++;
+      });
+      badge.hidden = kaufbar === 0;
+      badge.textContent = kaufbar ? "💠" + kaufbar : "";
+      badge.title = kaufbar ? kaufbar + " Verbesserung(en) bezahlbar" : "";
+    }
+  }
+
+  /** 0 = kein Abzeichen, 1 = Gyarados-Erbe, 2 = Mega Gyarados. */
+  function prestigeBadgeLevel() {
+    if (state.pUpgrades.p_mega) return 2;
+    if (state.pUpgrades.p_gyara) return 1;
+    return 0;
+  }
+
+  function buyPrestige(id) {
+    var u = PRESTIGE_BY_ID[id];
+    if (!u || !Object.prototype.hasOwnProperty.call(PRESTIGE_BY_ID, id)) return false;
+    if (state.pUpgrades[id]) { toast("Hast du schon."); return false; }
+    if (state.cores < u.cost) {
+      toast("Zu wenig Mega-Kerne: " + fmt(u.cost) + " nötig, du hast " + fmt(state.cores) + ".");
+      return false;
+    }
+    state.cores -= u.cost;
+    state.pUpgrades[id] = true;
+    rebuildPrestigeFlags();
+    syncFishLook();
+    renderAll();
+    checkAchievements();
+    save();
+    if (id === "p_mega") {
+      toast("\u{1F451} MEGA GYARADOS! Ab jetzt x3 auf alles.");
+      if (window.confettiBurst) window.confettiBurst();
+      flashMsg("\u{1F451} MEGA GYARADOS erwacht!");
+    } else {
+      toast("\u{2728} " + u.name + " gekauft: " + u.desc);
+    }
+    return true;
+  }
+
+  /** Leitet die Sonderfaehigkeiten aus den gekauften Knoten ab. */
+  function rebuildPrestigeFlags() {
+    state.pFlags = {};
+    PRESTIGE_UPGRADES.forEach(function (u) {
+      if (u.mode === "flag" && state.pUpgrades[u.id]) state.pFlags[u.id] = true;
+    });
+  }
+
+  function renderPrestige() {
+    var box = $("tyPrestige");
+    if (!box) return;
+    box.innerHTML = "";
+
+    var open = 0;
+    PRESTIGE_UPGRADES.forEach(function (u) {
+      var owned = !!state.pUpgrades[u.id];
+      var afford = !owned && state.cores >= u.cost;
+      if (owned) return;
+
+      var row = document.createElement("button");
+      row.type = "button";
+      row.className = "ty-core" + (afford ? "" : " locked");
+      row.title = u.name + " - " + u.desc;
+
+      var ic = document.createElement("span");
+      ic.className = "ty-core-icon";
+      ic.textContent = u.icon;
+
+      var body = document.createElement("span");
+      body.className = "ty-core-body";
+      var nm = document.createElement("strong");
+      nm.textContent = u.name;
+      var ds = document.createElement("small");
+      ds.textContent = u.desc;
+      body.appendChild(nm);
+      body.appendChild(ds);
+
+      var price = document.createElement("b");
+      price.className = "ty-core-cost";
+      price.textContent = u.cost + " Kerne";
+
+      row.appendChild(ic);
+      row.appendChild(body);
+      row.appendChild(price);
+      row.addEventListener("click", function () { buyPrestige(u.id); });
+      box.appendChild(row);
+      open++;
+    });
+
+    if (!open) {
+      var p = document.createElement("p");
+      p.className = "ty-empty";
+      p.textContent = "Alles gekauft. Der Teich ist vollendet.";
+      box.appendChild(p);
+    }
+
+    var mega = PRESTIGE_BY_ID.p_mega;
+    var note = $("tyMegaNote");
+    if (note && mega) {
+      note.textContent = state.pUpgrades.p_mega
+        ? "\u{1F451} Mega Gyarados ist erwacht. x3 auf alles."
+        : "Ziel: MEGA GYARADOS (" + mega.cost + " Kerne) - x3 auf alles und ein neuer Fisch.";
     }
   }
 
@@ -785,6 +982,7 @@
     renderAchievements();
     renderStats();
     renderAscend();
+    renderPrestige();
     renderBuffs();
   }
 
@@ -844,6 +1042,7 @@
   }
 
   var SELL_RATIO = 0.5;            /* Cookie Clicker gibt 50 % zurueck */
+  function sellRatio() { return hasPrestigeFlag("p_sell") ? 1 : SELL_RATIO; }
 
   /** Verkauft n Stueck eines Gebaeudes (Rueckerstattung 50 %). */
   function sellBuilding(id, n) {
@@ -857,7 +1056,7 @@
     var refund = 0;
     for (var i = 0; i < count; i++) {
       /* das zuletzt gekaufte Stueck hat die hoechsten Kosten -> von hinten abrechnen */
-      refund += buildingCost(b, owned - 1 - i) * SELL_RATIO;
+      refund += buildingCost(b, owned - 1 - i) * sellRatio();
     }
     refund = Math.floor(refund);
 
@@ -873,20 +1072,28 @@
   /* ---- Evolution: einmalig, bei EVOLVE_AT Gesamtblubber ---- */
   var EVOLVE_AT = 4e6;
 
+  /** Evolutions-Schwelle; "Schnelle Evolution" senkt sie auf 1 Mio. */
+  function evolveAt() { return hasPrestigeFlag("p_evolve") ? 1e6 : EVOLVE_AT; }
+
   /** Bild und Rahmen passend zum Evolutionszustand setzen (idempotent). */
   function syncFishLook() {
     var img = $("tyFishImg");
     var skin = $("tyFish");
     if (!img) return;
-    var target = state.evolved ? "assets/gyarados-avatar.jpg" : "assets/magikarp-avatar.jpg";
+    var mega = !!state.pUpgrades.p_mega;
+    var target = mega ? "assets/mega-gyarados-avatar.jpg"
+      : state.evolved ? "assets/gyarados-avatar.jpg" : "assets/magikarp-avatar.jpg";
     if (img.getAttribute("src") !== target) img.src = target;
-    img.alt = state.evolved ? "Gyarados" : "Magikarp";
-    if (skin) skin.classList.toggle("evolved", !!state.evolved);
+    img.alt = mega ? "Mega Gyarados" : state.evolved ? "Gyarados" : "Magikarp";
+    if (skin) {
+      skin.classList.toggle("evolved", !!state.evolved && !mega);
+      skin.classList.toggle("mega", mega);
+    }
   }
 
   function applyEvolution() {
     if (state.evolved) return false;
-    if (state.allTime < EVOLVE_AT) return false;
+    if (state.allTime < evolveAt()) return false;
     state.evolved = true;
     syncFishLook();
     flashMsg("\u{1F409} EVOLUTION! Gyarados bringt ab jetzt +25 % auf alles.");
@@ -901,10 +1108,23 @@
   /* ---- Aufstieg / Prestige ---- */
   var ASCEND_MIN = 1e7;
 
+  /** Wie viele Prestige-LEVEL gibt es fuer diese Runde? */
   function ascendPointsFor(total) {
     if (total < ASCEND_MIN) return 0;
-    /* ab 10 Mio: 1 Punkt, danach kubisch wachsend */
-    return Math.floor(Math.pow(total / ASCEND_MIN, 0.6));
+    return Math.floor(Math.pow(total / ASCEND_MIN, CORE_RATIO));
+  }
+
+  /** Wie viele Mega-Kerne gibt es fuer diese Runde?
+      Ein Aufstieg gibt immer mehr Kerne als Level, damit man im
+      Baum vorankommt. Die Waehrung ist bewusst grosszuegiger als
+      der Level-Bonus, genau wie Cookie Clickers Chips. */
+  function coresForLevels(levels) {
+    if (levels < 1) return 0;
+    return CORE_START + Math.floor(Math.pow(levels, 1.15));
+  }
+
+  function coresForAscend() {
+    return coresForLevels(ascendPointsFor(state.total));
   }
 
   function ascend() {
@@ -913,11 +1133,15 @@
       toast("Für einen Aufstieg brauchst du mindestens " + fmt(ASCEND_MIN) + " Blubber in dieser Runde.");
       return false;
     }
-    if (!window.confirm("Aufsteigen? Konto, Gebäude und Upgrades werden zurückgesetzt. Du bekommst +" + pts +
-      " % permanenten Bonus, deine Erfolge bleiben.")) return false;
+    var newCores = coresForLevels(pts);
+    if (!window.confirm("Aufsteigen? Konto, Gebäude und Upgrades werden zurückgesetzt.\n\n" +
+      "Du bekommst +" + pts + " Prestige-Level (dauerhaft +" + (state.ascPoints + pts) +
+      " % Bonus) und " + newCores + " Mega-Kerne für den Prestige-Baum.\n" +
+      "Erfolge und der Baum bleiben erhalten.")) return false;
     state.bank = 0;
     state.total = 0;
     state.ascPoints += pts;
+    state.cores += newCores;
     state.ascensions++;
     BUILDINGS.forEach(function (b) { state.buildings[b.id] = 0; });
     state.upgrades = {};
@@ -925,17 +1149,17 @@
     state.seasonTime = 0;
     state.seasonActive = false;
     /* Evolution haengt an allTime, bleibt also erhalten. Bild danach ausrichten. */
-    state.evolved = state.allTime >= EVOLVE_AT;
+    state.evolved = state.allTime >= evolveAt();
     syncFishLook();
     renderAll();
     checkAchievements();
     save();
-    toast("\u{1F300} Aufgestiegen! Neuer Bonus: +" + state.ascPoints + " %");
+    toast("\u{1F300} Aufgestiegen! +" + pts + " Level, +" + newCores + " Mega-Kerne. Bonus: +" + state.ascPoints + " %");
     return true;
   }
 
   function doReset() {
-    if (!window.confirm("Alles löschen? Konto, Gebäude, Upgrades, Erfolge und Aufstiege verschwinden endgültig.")) return false;
+    if (!window.confirm("Alles löschen? Konto, Gebäude, Upgrades, Erfolge, Aufstiege, Mega-Kerne und der komplette Prestige-Baum verschwinden endgültig.")) return false;
     try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
     state = newState();
     syncFishLook();
@@ -957,7 +1181,7 @@
     document.querySelectorAll(".ty-tab").forEach(function (b) {
       b.classList.toggle("active", b.getAttribute("data-tab") === name);
     });
-    ["buildings", "upgrades", "achievements", "stats"].forEach(function (n) {
+    ["buildings", "upgrades", "achievements", "prestige", "stats"].forEach(function (n) {
       var pane = $("tyPane-" + n);
       if (pane) pane.classList.toggle("hidden", n !== name);
     });
@@ -1025,6 +1249,8 @@
         stats: state.stats,
         ascensions: state.ascensions,
         ascPoints: state.ascPoints,
+        cores: state.cores,
+        pUpgrades: state.pUpgrades,
         seasonIdx: state.seasonIdx,
         seasonTime: state.seasonTime,
         seasonActive: state.seasonActive,
@@ -1060,6 +1286,16 @@
     state.evolved = !!d.evolved;
     state.ascensions = Math.floor(num(d.ascensions));
     state.ascPoints = Math.floor(num(d.ascPoints));
+    state.cores = Math.floor(num(d.cores));
+    if (d.pUpgrades && typeof d.pUpgrades === "object") {
+      Object.keys(d.pUpgrades).forEach(function (k) {
+        /* Nur echte Baum-IDs und nur echte true-Werte uebernehmen. */
+        if (Object.prototype.hasOwnProperty.call(PRESTIGE_BY_ID, k) && d.pUpgrades[k] === true) {
+          state.pUpgrades[k] = true;
+        }
+      });
+    }
+    rebuildPrestigeFlags();
     state.seasonIdx = Math.min(SEASONS.length - 1, Math.floor(num(d.seasonIdx)));
     state.seasonTime = Math.min(SEASON_LEN, num(d.seasonTime));
     state.seasonActive = !!d.seasonActive;
@@ -1106,7 +1342,8 @@
     var idle = hasStamp ? (nowMs - state.lastSeen) / 1000 : 0;
     if (idle > 60) {
       var capped = Math.min(idle, 3 * 3600);
-      var gain = computeCps() * capped * 0.5;   /* 50 % Effizienz offline */
+      var eff = hasPrestigeFlag("p_offline") ? 1 : 0.5;
+      var gain = computeCps() * capped * eff;
       if (gain > 1) {
         state.bank += gain;
         state.total += gain;
@@ -1267,6 +1504,12 @@
     buyUpgrade: buyUpgrade,
     ascend: ascend,
     ascendPointsFor: ascendPointsFor,
+    coresForLevels: coresForLevels,
+    coresForAscend: coresForAscend,
+    buyPrestige: buyPrestige,
+    prestigeUpgrades: PRESTIGE_UPGRADES,
+    hasPrestigeFlag: hasPrestigeFlag,
+    prestigeBadgeLevel: prestigeBadgeLevel,
     reset: doReset,
     save: save,
     load: load,

@@ -803,11 +803,13 @@
       var BONI = {a_100:0.01,a_1000:0.02,a_10k:0.05,a_total1:0.01,a_total2:0.02,a_total3:0.03,
                   a_total4:0.07,a_b10:0.02,a_b100:0.04,a_cps1:0.01,a_cps2:0.03,a_evo:0.05,
                   a_gold:0.02,a_gold5:0.03,a_gold25:0.05,a_season:0.02,a_ascend:0.02,
-                  a_ascend5:0.05,a_upg:0.02,a_sell:0.02,a_ms10:0.04,a_mini:0.03};
+                  a_ascend5:0.05,a_upg:0.02,a_sell:0.02,a_ms10:0.04,a_mini:0.03,
+                  a_core1:0.02,a_core25:0.03,a_gyara:0.05,a_mega:0.10};
       var tStats = d.stats && typeof d.stats === "object" ? d.stats : {};
       var tTotal = Math.max(0, Number(d.total) || 0);
       var tClicks = Math.max(0, Number(d.clicks) || 0);
       var tAsc = Math.max(0, Number(d.ascensions) || 0);
+      var tPUp = d.pUpgrades && typeof d.pUpgrades === "object" ? d.pUpgrades : {};
       var tNb = 0;
       IDS.forEach(function(id){ tNb += Math.max(0, Math.floor(Number(b[id]) || 0)); });
       var tAllSpecies = IDS.every(function(id){ return Math.max(0, Math.floor(Number(b[id]) || 0)) > 0; });
@@ -833,7 +835,14 @@
         a_ms10: tMsTotal >= 10,
         a_mini: tAllSpecies
       };
-      var tAchBonus = 0;
+      /* Neue Prestige-Erfolge: das Spiel prueft sie bei jedem Start neu,
+         der Teaser muss dieselbe Regel anwenden. */
+      var tCores = Math.max(0, Math.floor(Number(d.cores) || 0));
+      tErreicht.a_core1  = tCores >= 1 || tAsc >= 1;
+      tErreicht.a_core25 = tCores >= 25;
+      tErreicht.a_gyara  = tPUp.p_gyara === true;
+      tErreicht.a_mega   = tPUp.p_mega === true;
+      tAchBonus = 0;   /* neu aufsummieren, inkl. der neuen Erfolge */
       Object.keys(BONI).forEach(function(k){
         if(tAch[k] === true || tErreicht[k] === true) tAchBonus += BONI[k];
       });
@@ -841,10 +850,21 @@
       cps *= (1 + Math.max(0, Number(d.ascPoints) || 0) / 100);
       if(d.evolved) cps *= 1.25;
 
+      /* Prestige-Baum: muss mit den Werten in tycoon.js uebereinstimmen,
+         sonst zeigt die Startseite andere Zahlen als das Spiel. */
+      var tPBonus = 0, tPMult = 1;
+      [["p_start",20],["p_gold",25],["p_gyara",50]].forEach(function(pair){
+        if(tPUp[pair[0]] === true) tPBonus += pair[1];
+      });
+      /* p_crit und p_ms sind Sonderverhalten (Krit-Chance, Meilensteine),
+         keine globalen Multiplikatoren - nur p_mega zaehlt hier. */
+      if(tPUp.p_mega === true) tPMult *= 3;
+      cps *= (1 + tPBonus / 100) * tPMult;
+
       cpsEl.textContent = fmt(cps) + "/s";
 
       var got = Object.keys(tAch).length;
-      achEl.textContent = got + "/23";
+      achEl.textContent = got + "/27";
     }
 
     function start(){

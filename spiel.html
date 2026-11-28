@@ -86,6 +86,7 @@
           <button class="ty-tab active" data-tab="buildings" type="button" role="tab">🏗 Gebäude</button>
           <button class="ty-tab" data-tab="upgrades" type="button" role="tab">⬆️ Upgrades <span id="tyUpgCount">–</span></button>
           <button class="ty-tab" data-tab="achievements" type="button" role="tab">🏆 Erfolge <span id="tyAchCount">0/20</span></button>
+          <button class="ty-tab" data-tab="prestige" type="button" role="tab">🌀 Prestige <span id="tyPrestBadge" class="ty-badge" hidden></span></button>
           <button class="ty-tab" data-tab="stats" type="button" role="tab">📊 Statistik</button>
         </div>
 
@@ -113,14 +114,38 @@
           <div class="ty-achs" id="tyAchievements"></div>
         </div>
 
-        <div class="ty-pane hidden" id="tyPane-stats">
-          <div class="ty-pane-head"><strong>Statistik</strong></div>
-          <div class="ty-stats" id="tyStats"></div>
+        <div class="ty-pane hidden" id="tyPane-prestige">
+          <div class="ty-pane-head">
+            <strong>Prestige-Baum</strong>
+            <span>dauerhaft, überlebt jeden Aufstieg</span>
+          </div>
+
+          <div class="ty-core-top">
+            <div class="ty-core-stat">
+              <span>Prestige-Level</span>
+              <b id="tyPrestLvl">0</b>
+              <small>je +1 % Produktion, wird nie ausgegeben</small>
+            </div>
+            <div class="ty-core-stat">
+              <span>Mega-Kerne</span>
+              <b id="tyCores">0</b>
+              <small>zum Ausgeben im Baum</small>
+            </div>
+          </div>
+
+          <p class="ty-core-note" id="tyMegaNote">Ziel: MEGA GYARADOS</p>
+          <div class="ty-cores" id="tyPrestige"></div>
+
           <div class="ty-ascend">
             <p id="tyAscendInfo">Prestige: steige auf für einen permanenten Bonus.</p>
             <button class="btn btn-primary btn-sm" type="button" id="tyAscendBtn">🌀 Aufsteigen</button>
             <span class="ty-asc-bonus">aktueller Bonus: <b id="tyAscBonus">+0 %</b></span>
           </div>
+        </div>
+
+        <div class="ty-pane hidden" id="tyPane-stats">
+          <div class="ty-pane-head"><strong>Statistik</strong></div>
+          <div class="ty-stats" id="tyStats"></div>
         </div>
       </div>
     </div>

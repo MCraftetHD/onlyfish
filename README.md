@@ -35,7 +35,7 @@ Der Bot antwortet mit dem Link zu dieser Seite.
 - 💬 Fake-DM mit Auto-Antworten („Blub.")
 - 📋 `!onlyfish` kopieren, Countdown zum nächsten Stream (22:30 Uhr)
 - 🔴 **Echter Live-Status** über decapi.me (live/offline, Spiel, Titel, Uptime) + optionaler Stream-Embed
-- 🎮 **Magikarp Tycoon:** vollwertiger Cookie-Clicker-Klon mit 8 Gebäuden, 38 Upgrades, Erfolgen, Jahreszeiten, Blubber-Bällen und Prestige
+- 🎮 **Magikarp Tycoon:** vollwertiger Cookie-Clicker-Klon mit 10 Gebäuden, 46 Upgrades, 27 Erfolgen, Jahreszeiten, Blubber-Bällen und einem Prestige-Baum, der in **Mega Gyarados** gipfelt
 - 🏆 **Blubber-Leaderboard:** Name eintragen (max. 15 Zeichen, gefiltert), Speicherung lokal im Browser
 - Blasen-Animation, Splash-Effekte, Konfetti
 
@@ -116,16 +116,47 @@ Ab **25, 50, 100, 150 und 200** Stück bekommt ein Gebäude dauerhaft **+1 %** a
 
 ### Weitere Systeme
 
-- **Erfolge:** 23 Stück, jeder gibt dauerhaft **+1 bis +7 % Produktion** (insgesamt +64 % möglich). Jeder zeigt seinen Fortschritt live an (z. B. „1.847 / 10.000 Klicks").
+- **Erfolge:** 27 Stück, jeder gibt dauerhaft **+1 bis +10 % Produktion** (insgesamt +77 % möglich). Jeder zeigt seinen Fortschritt live an (z. B. „1.847 / 10.000 Klicks").
 - **Blubber-Ball:** schwebt alle 90–180 s vorbei. Beim Klick: Sofort-Blubber (15 % des Kontos), *Klick-Frenzy* (15 s lang 77-fach), *Drachenrausch* (30 s lang 7-fach Produktion) oder – wie beim Original – nichts
 - **Jahreszeiten:** wechseln alle 2 Minuten Spielzeit, dazwischen 4 Minuten Ruhe. Sommer **+25 % Produktion**, Herbst −15 % dafür mehr Bälle, Winter stärkere Ball-Belohnungen
 - **Evolution:** ab **4 Mio.** gesammelten Blubber wird Magikarp zu Gyarados und gibt dauerhaft **+25 %**
-- **Aufstieg (Prestige):** ab **10 Mio.** in einer Runde. Punkte wachsen mit `(Runde/10 Mio)^0,6`, jeder Punkt gibt +1 % permanent. Gebäude und Konto werden zurückgesetzt, Erfolge bleiben
+- **Aufstieg (Prestige):** ab **10 Mio.** in einer Runde. Level wachsen mit `(Runde/10 Mio)^0,6`. Gebäude und Konto werden zurückgesetzt, Erfolge und der Prestige-Baum bleiben
 - **Offline-Produktion:** bis zu 3 Stunden bei 50 % Effizienz
+
+### Prestige-Baum und Mega Gyarados
+
+Der Aufstieg gibt seit Version 4 **zwei getrennte Dinge** – genau wie Cookie Clickers Heavenly Chips:
+
+| | Was | Wirkung |
+|---|---|---|
+| 🌀 **Prestige-Level** | dauerhaft, wird **nie** ausgegeben | je **+1 %** Produktion |
+| 💠 **Mega-Kerne** | ausgabbare Währung | bezahlt den Prestige-Baum |
+
+**Ausgeben senkt den Level-Bonus nicht.** Wer 10 Level hat und alle Kerne im Baum verprasst, behält seine +10 %.
+
+Ein Aufstieg gibt `2 + Level^1,15` Kerne. Bei 10 Mio. (1 Level) sind das 3, bei 100 Mio. (3 Level) 6, bei 1 Mrd. (15 Level) 24.
+
+**Der Baum (11 Knoten, 194 Kerne für alles):**
+
+| Knoten | Kerne | Wirkung |
+|---|---|---|
+| 🌱 Samenkorn | 2 | +20 % Produktion |
+| 🖐 Günstige Flossen | 3 | +50 % Blubber pro Klick |
+| 🟡 Goldene Schuppen | 4 | +25 % Produktion |
+| 🐉 Schnelle Evolution | 5 | Evolution ab 1 Mio. statt 4 Mio. |
+| 🏷 Fisch-Mengenrabatt | 8 | Gebäude kosten +12 % statt +15 % pro Stück |
+| 💸 Treue Händler | 10 | Verkauf bringt 100 % statt 50 % |
+| ⚡ Blitz-Flossen | 14 | doppelte Krit-Chance (max. 70 %) |
+| 🌙 Mondlicht | 18 | offline 100 % statt 50 % Effizienz |
+| ⭐ Meilenstein-Prämie | 25 | Meilensteine geben doppelt so viel |
+| 🐉 Gyarados-Erbe | 35 | +50 % Produktion |
+| 👑 **MEGA GYARADOS** | 70 | **×3 auf alles** und ein neuer Fisch |
+
+Mega Gyarados ist nach etwa **4–5 Aufstiegen** erreichbar (bei 1 Mrd. gesammeltem Blubber gibt es 24 Kerne pro Runde). Danach wechselt das Fischbild auf `assets/mega-gyarados-avatar.jpg` und der Rahmen pulsiert rot-gold.
 
 ### Speicherung
 
-`localStorage` unter `onlyfish.tycoon.v3`. Ein vorhandenes Save aus der alten Version (`onlyfish.save.v2`) wird beim ersten Start automatisch übernommen. Alle geladenen Werte werden auf endliche, nicht-negative Zahlen geprüft – ein manipuliertes Save kann das Spiel nicht kaputt machen.
+`localStorage` unter `onlyfish.tycoon.v3` (Save-Version 4). Ein vorhandenes Save aus der alten Version (`onlyfish.save.v2`) wird beim ersten Start automatisch übernommen. Ältere Spielstände ohne Kerne laufen unverändert weiter – Level und Erfolge bleiben, es kommen nur Kerne und Baum dazu. Alle geladenen Werte werden auf endliche, nicht-negative Zahlen geprüft – ein manipuliertes Save kann das Spiel nicht kaputt machen.
 
 ### Balance (gemessen, nicht geschätzt)
 
